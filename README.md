@@ -34,7 +34,7 @@ customer-churn-prediction/
 ## How to Run
 
 ```bash
-git clone <this-repo-url>
+git clone https://github.com/Ansh-0815/customer-churn-prediction
 cd customer-churn-prediction
 pip install -r requirements.txt
 jupyter notebook notebook/churn_prediction.ipynb

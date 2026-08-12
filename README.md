@@ -1,6 +1,13 @@
 # Customer Churn Prediction - Production Django Dashboard
 
+[![Live Production App](https://img.shields.io/badge/Live_App-Render_Production-00B4D8?style=for-the-badge&logo=render&logoColor=white)](https://customer-churn-prediction-589p.onrender.com)
+[![Interactive Notebook Study](https://img.shields.io/badge/Notebook_Study-Jupyter_HTML-FF6F61?style=for-the-badge&logo=jupyter&logoColor=white)](https://customer-churn-prediction-589p.onrender.com/notebook)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Ansh--0815%2Fcustomer--churn--prediction-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ansh-0815/customer-churn-prediction)
+
 An end-to-end Machine Learning & Web Production System built with **Django 5**, **MLflow**, and **Scikit-Learn** that predicts telecom customer churn in real time and provides an executive intelligence dashboard with automated retraining and an extended EDA notebook study.
+
+- 🌐 **Live Website URL**: **[https://customer-churn-prediction-589p.onrender.com](https://customer-churn-prediction-589p.onrender.com)**
+- 📖 **Live Notebook Study**: **[https://customer-churn-prediction-589p.onrender.com/notebook](https://customer-churn-prediction-589p.onrender.com/notebook)**
 
 ---
 
@@ -77,7 +84,8 @@ customer-churn-prediction/
 │   └── urls.py                 # App URL route definitions
 │
 ├── templates/
-│   └── index.html              # Bento-Grid executive dashboard template
+│   ├── index.html              # Bento-Grid executive dashboard template
+│   └── notebook.html           # Pre-compiled static notebook HTML template
 │
 ├── static/
 │   ├── style.css               # Frosted Glassmorphism design system & CSS theme

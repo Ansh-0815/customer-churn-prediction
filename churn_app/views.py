@@ -169,6 +169,12 @@ def get_feature_importance(request):
 @require_GET
 def get_notebook_html(request):
     try:
+        # 1. Instant static response if pre-rendered template exists (0 MB extra RAM, <5ms response time)
+        pre_rendered = os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates", "notebook.html")
+        if os.path.exists(pre_rendered):
+            return render(request, 'notebook.html')
+
+        # 2. Dynamic fallback conversion
         import nbformat
         from nbconvert import HTMLExporter
         

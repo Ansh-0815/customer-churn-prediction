@@ -1,0 +1,23 @@
+artifact_path: file:///C:/Users/agarw/Desktop/Customer_Churn_Model/mlruns/1/models/m-a12a06a318064f22a5185f00464cd42f/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.skops
+    predict_fn: predict
+    python_version: 3.10.9
+  sklearn:
+    code: null
+    pickled_model: model.skops
+    serialization_format: skops
+    sklearn_version: 1.7.2
+    skops_trusted_types: null
+mlflow_version: 3.14.0
+model_id: m-a12a06a318064f22a5185f00464cd42f
+model_size_bytes: 4056031
+model_uuid: m-a12a06a318064f22a5185f00464cd42f
+prompts: null
+run_id: 64454606c35249c48e1139f756fd3e56
+utc_time_created: '2026-07-31 14:26:11.104798'

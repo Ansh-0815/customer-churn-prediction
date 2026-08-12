@@ -1,124 +1,199 @@
-# Customer Churn Prediction
+# Customer Churn Prediction - Production Django Dashboard
 
-End-to-end machine learning project that predicts which telecom customers are likely to churn, so the business can act before they leave - built and cleaned up from scratch after reviewing two reference implementations for common bugs and best practices (see [Notes on Reference Notebooks](#notes-on-reference-notebooks) below).
+An end-to-end Machine Learning & Web Production System built with **Django 5**, **MLflow**, and **Scikit-Learn** that predicts telecom customer churn in real time and provides an executive intelligence dashboard with automated retraining and embedded EDA notebook study.
+
+---
+
+## Application Screenshots (Captured from Live Web Dashboard)
+
+### 1. Executive Churn Dashboard (`/`)
+![Executive Churn Dashboard Overview](static/assets/dashboard_overview.png)
+
+### 2. Customer Churn Predictor (`/predict`)
+![Customer Churn Predictor Interface](static/assets/churn_predictor.png)
+
+### 3. MLflow Model Retraining & SSE Log Streaming (`/train`)
+![MLflow Model Retraining Console](static/assets/model_training.png)
+
+### 4. Exploratory Data Analysis & Feature Exploration (`/eda`)
+![Exploratory Data Analysis Dashboard](static/assets/eda_analysis.png)
+
+---
+
+## Jupyter Notebook EDA & Model Study Charts
+
+Extracted directly from [`notebook/churn_prediction.ipynb`](notebook/churn_prediction.ipynb):
+
+| Chart 1: Churn Class Distribution | Chart 2: Churn by Contract Type |
+| :---: | :---: |
+| ![Target Churn Class Distribution](static/assets/notebook_chart_1.png) | ![Churn Rate by Contract Type](static/assets/notebook_chart_2.png) |
+
+| Chart 3: Tenure Cohort Distribution | Chart 4: Monthly Charges vs Churn |
+| :---: | :---: |
+| ![Tenure vs Churn Distribution](static/assets/notebook_chart_3.png) | ![Monthly Charges vs Churn Distribution](static/assets/notebook_chart_4.png) |
+
+| Chart 5: Internet Service Churn | Chart 6: 10-Model Benchmark |
+| :---: | :---: |
+| ![Internet Service Type vs Churn](static/assets/notebook_chart_5.png) | ![10-Model Classification Performance Comparison](static/assets/notebook_chart_6.png) |
+
+| Chart 7: Effect of SMOTE | Chart 8: Top Churn Drivers |
+| :---: | :---: |
+| ![SMOTE Class Imbalance Treatment Effect](static/assets/notebook_chart_7.png) | ![Feature Importance Rankings](static/assets/notebook_chart_8.png) |
+
+---
 
 ## Executive Summary
 
-- Compared **10 classification algorithms** on churn prediction using Accuracy, Precision, Recall, F1, F2, and ROC AUC.
-- **Gradient Boosting, AdaBoost, and Logistic Regression** were the strongest baseline models (ROC AUC ≈ 0.84, confirmed with 5-fold cross-validation).
-- Applied **SMOTE** to address class imbalance (26.5% churn rate), trading some precision for a large recall gain - the right tradeoff when missing a churner is costlier than a false alarm.
-- Tuned Gradient Boosting with **RandomizedSearchCV** (5-fold CV, ROC AUC scoring) and extracted feature importances to identify the top churn drivers: **tenure, contract type, and monthly/total charges**.
-- Saved the final model with `joblib` and built a **correct** single-customer prediction function - including a fix for a subtle but common encoding bug (see below).
+- **Production Web Dashboard**: Built with Django 5, featuring a sleek, responsive Bento-Grid UI with real-time customer risk intelligence, MLflow model telemetry, and interactive Chart.js visualizations.
+- **Instant Risk Predictor**: Form-driven REST API (`/predict`) providing instant single-customer churn risk scoring and risk-meter visualization.
+- **Live Retraining & SSE Telemetry**: Trigger model retraining directly from the UI (`/train`) with real-time console log streaming via Server-Sent Events (`/train/stream`).
+- **Embedded Jupyter Notebook Study**: Dynamically converts and renders the project's exploratory data analysis and model comparison notebook (`notebook/churn_prediction.ipynb`) into HTML (`/notebook`).
+- **ML Model Performance**: Evaluated 10 classification algorithms; tuned **Gradient Boosting Classifier** with **SMOTE** oversampling to achieve high recall on churners while maintaining **ROC AUC ≈ 0.84**.
 
-## Dataset
+---
 
-**Source:** [IBM Telco Customer Churn dataset](https://www.kaggle.com/datasets/blastchar/telco-customer-churn) - 7,043 customers, 21 features (demographics, account info, subscribed services, and the `Churn` target).
-
-## Project Structure
+## Architecture & Project Structure
 
 ```
 customer-churn-prediction/
-├── README.md
-├── requirements.txt
-├── .gitignore
+├── manage.py                   # Django CLI management utility
+├── Procfile                    # Production Gunicorn entrypoint
+├── render.yaml                 # Render 1-click cloud deployment blueprint
+├── requirements.txt            # Python dependencies (Django, MLflow, Scikit-Learn, WhiteNoise)
+├── README.md                   # Project documentation
+│
+├── churn_project/              # Core Django Project Configuration
+│   ├── __init__.py
+│   ├── settings.py             # Django settings (WhiteNoise, env vars, static files)
+│   ├── urls.py                 # Root URL dispatcher
+│   ├── wsgi.py                 # WSGI entrypoint for production
+│   └── asgi.py                 # ASGI entrypoint
+│
+├── churn_app/                  # Django Web Application
+│   ├── __init__.py
+│   ├── apps.py                 # App configuration
+│   ├── views.py                # Views for /, /predict, /metrics, /train, /train/stream, /notebook
+│   └── urls.py                 # App URL route definitions
+│
+├── templates/
+│   └── index.html              # Bento-Grid executive dashboard template
+│
+├── static/
+│   ├── style.css               # Modern glassmorphism & dark perspective CSS theme
+│   ├── script.js               # Dynamic charts, SSE stream reader, and predictor logic
+│   └── assets/                 # Captured web application screenshots & notebook charts
+│
 ├── data/
-│   └── Telco-Customer-Churn.csv
-├── notebook/
-│   └── churn_prediction.ipynb
-└── models/
-    ├── churn_model.pkl        # Final tuned Gradient Boosting model
-    ├── scaler.pkl              # StandardScaler fit on training data only
-    └── model_columns.pkl       # Exact training feature column order
+│   └── Telco-Customer-Churn.csv# IBM Telco Customer Churn dataset (7,043 rows, 21 columns)
+│
+├── models/
+│   ├── churn_model.pkl         # Final tuned Gradient Boosting model weights
+│   ├── scaler.pkl             # StandardScaler fit on training data
+│   ├── model_columns.pkl      # Training feature column order
+│   ├── metrics.json           # Model validation metrics
+│   └── feature_importance.json# Extracted feature importance values
+│
+└── notebook/
+    └── churn_prediction.ipynb # Full EDA and 10-model comparative study notebook
 ```
 
-## How to Run
+---
+
+## Features & Endpoints
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/` | `GET` | **Executive Dashboard**: Displays key cohort stats, MLflow metrics, interactive Chart.js charts, and predictor form. |
+| `/predict` | `POST` | **Churn Risk API**: Accepts customer JSON payload and returns prediction (`Churn` / `No Churn`) and risk probability. |
+| `/metrics` | `GET` | **Model Telemetry API**: Serves current Accuracy, Precision, Recall, F1 Score, and ROC AUC metrics. |
+| `/train` | `POST` | **Retrain Pipeline**: Spawns background process executing `main.py` training pipeline. |
+| `/train/stream` | `GET` | **SSE Log Stream**: Streams real-time pipeline execution logs to console widget using Server-Sent Events. |
+| `/feature_importance` | `GET` | **Feature Ranking API**: Serves JSON of feature importances extracted from tuned model weights. |
+| `/notebook` | `GET` | **Embedded Notebook Study**: Renders `churn_prediction.ipynb` dynamically in HTML format using `nbconvert`. |
+
+---
+
+## How to Run Locally
+
+### 1. Clone Repository & Setup Environment
 
 ```bash
 git clone https://github.com/Ansh-0815/customer-churn-prediction
 cd customer-churn-prediction
+
+# Create and activate virtual environment
+python -m venv venv
+# On Windows:
+.\venv\Scripts\activate
+# On Linux/macOS:
+source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
-jupyter notebook notebook/churn_prediction.ipynb
 ```
 
-The notebook runs top-to-bottom with no manual steps - it reads `data/Telco-Customer-Churn.csv`, trains all models, and re-saves the model artifacts into `models/`.
+### 2. Run Development Server
 
-## Methodology
+```bash
+python manage.py runserver 5001
+```
 
-1. **Data Cleaning** - `TotalCharges` is stored as text with 11 blank entries (all customers with `tenure == 0`, i.e. brand-new accounts); converted to numeric and imputed with the median rather than silently dropped.
-2. **EDA** - Interactive Plotly charts + seaborn plots covering churn rate, contract type, tenure, monthly charges, internet service, and add-on services (Online Security, Tech Support).
-3. **Feature Engineering** - Binary categoricals label-encoded, multi-category categoricals one-hot encoded. Train/test split happens **before** scaling, and the `StandardScaler` is fit only on the training set to avoid data leakage.
-4. **Baseline Comparison** - 10 classifiers evaluated on Accuracy/Precision/Recall/F1/F2/ROC AUC, cross-validated for stability.
-5. **Class Imbalance Handling** - SMOTE applied to the training set only (never to the test set), compared against class-weighted baselines.
-6. **Hyperparameter Tuning** - `RandomizedSearchCV` on Gradient Boosting (25 iterations, 5-fold CV, ROC AUC scoring).
-7. **Feature Importance** - Extracted from the tuned model to identify actionable churn drivers.
-8. **Model Persistence** - `joblib`-saved model, scaler, and column schema, plus a single-customer prediction function.
+Open your browser and navigate to: **[http://127.0.0.1:5001/](http://127.0.0.1:5001/)**
 
-## Key Results
+### 3. Run Windows Production Server (Waitress)
 
-### Baseline model comparison (test set)
+```bash
+waitress-serve --port=5001 churn_project.wsgi:application
+```
 
-| Model | Accuracy | Precision | Recall | F1 | ROC AUC |
-|---|---|---|---|---|---|
-| Voting Classifier | 0.803 | 0.663 | 0.527 | 0.587 | 0.844 |
-| AdaBoost | 0.805 | 0.669 | 0.524 | 0.588 | 0.843 |
-| Logistic Regression | 0.739 | 0.505 | 0.783 | 0.614 | 0.842 |
-| Gradient Boosting | 0.797 | 0.650 | 0.511 | 0.572 | 0.840 |
-| Random Forest | 0.784 | 0.621 | 0.473 | 0.537 | 0.826 |
+### 4. Run Linux Production Server (Gunicorn)
 
-*(Full 10-model table, confusion matrices, and ROC curves are in the notebook.)*
+```bash
+gunicorn churn_project.wsgi:application --bind 0.0.0.0:5001
+```
 
-5-fold cross-validation confirmed the ranking is stable (Voting Classifier: 0.850 ± 0.025 ROC AUC; AdaBoost: 0.847 ± 0.026; Logistic Regression: 0.846 ± 0.025).
+---
 
-### Effect of SMOTE
+## Deploying to Cloud (Render)
 
-| Model | Recall (baseline) | Recall (SMOTE) |
-|---|---|---|
-| Logistic Regression | 0.783 | 0.701 |
-| Gradient Boosting | 0.511 | 0.746 |
-| Random Forest | 0.473 | 0.636 |
+This repository includes a pre-configured `render.yaml` blueprint for 1-click cloud deployment:
 
-Gradient Boosting benefits the most from SMOTE - recall on churners jumps from 51% to 75%, at some cost to precision. This is a good trade for most subscription businesses, where a missed churner is more expensive than an unnecessary retention offer.
+1. Push your repository to **GitHub**.
+2. Log into [Render Dashboard](https://dashboard.render.com/) and click **New +** $\rightarrow$ **Blueprint**.
+3. Connect `Ansh-0815/customer-churn-prediction`.
+4. Render automatically applies the build command (`pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate`) and start command (`gunicorn churn_project.wsgi:application`).
 
-### Tuned model (final)
+---
 
-- **Best params:** `learning_rate≈0.089, max_depth=5, n_estimators=369, subsample≈0.92`
-- **Cross-validated ROC AUC:** 0.911 (on SMOTE-balanced training data)
-- **Test set:** Precision 0.54 / Recall 0.63 / F1 0.58 for the churn class; ROC AUC 0.808
+## Machine Learning Methodology
 
-### Top churn drivers (feature importance)
+1. **Data Cleaning**: Handled missing `TotalCharges` entries for zero-tenure accounts via median imputation.
+2. **Feature Engineering**: Encoded categorical attributes and scaled numeric features using `StandardScaler` (fit exclusively on the training split to prevent data leakage).
+3. **Class Imbalance Treatment**: Applied **SMOTE** oversampling on the training set to address minority class imbalance (26.5% baseline churn rate).
+4. **Model Comparison**: Compared 10 classifiers across Accuracy, Precision, Recall, F1, and ROC AUC:
+   - *Gradient Boosting*
+   - *AdaBoost*
+   - *Logistic Regression*
+   - *Random Forest*
+   - *Extra Trees*
+   - *Support Vector Machine (SVM)*
+   - *K-Nearest Neighbors (KNN)*
+   - *Decision Tree*
+   - *Naive Bayes*
+   - *Voting Classifier*
+5. **Hyperparameter Tuning**: Applied `RandomizedSearchCV` on Gradient Boosting to optimize learning rate, tree depth, and estimators.
 
-1. **Tenure**
-2. **Two-year contract** (protective - reduces churn)
-3. **Monthly Charges**
-4. **Total Charges**
-5. **One-year contract** (also protective)
-6. **Electronic check payment method**
-7. **Fiber optic internet**
-
-## Business Recommendations
-
-- Target **month-to-month customers in their first 3 months** with onboarding incentives or discounted upgrades to longer contracts.
-- Bundle **Online Security and Tech Support** into introductory packages - customers without these add-ons churn noticeably more.
-- Review **Fiber optic pricing/reliability** - this segment shows disproportionately high churn versus DSL.
-- Use the model's **churn probability score** to prioritize retention outreach rather than contacting the entire customer base.
-
-## Notes on Reference Notebooks
-
-This project was built after reviewing two public reference notebooks on the same dataset, specifically to avoid two real bugs found in them:
-
-1. **Test-set leakage in scaling** - one reference fit a fresh `StandardScaler` on the test set instead of reusing the scaler fit on the training set. Fixed here by always fitting on train only.
-2. **Broken single-row inference** - a reference notebook's prediction function used `pd.get_dummies()` directly on a single new customer row. With only one row, every categorical column has just one unique value, so `drop_first=True` treats it as "the first category" and drops it - silently zeroing out every one-hot feature. This project's `predict_churn()` function instead encodes new rows against the **fixed training-time vocabulary** (`model_columns.pkl`), which is the correct approach for production inference.
-
-## Limitations & Future Work
-
-- No temporal/behavioral data (usage trends, support tickets, complaints) - only a single snapshot per customer.
-- Customer Lifetime Value (CLV) was not incorporated into retention prioritization.
-- Decision threshold was left at the default 0.5; a business-cost-weighted threshold would likely improve real-world ROI.
-- A survival analysis (e.g., Kaplan-Meier or Cox proportional hazards) could add a *time-to-churn* dimension a classifier alone can't provide.
+---
 
 ## Tech Stack
 
-- **Python:** pandas, numpy, scikit-learn, imbalanced-learn, scipy
-- **Visualization:** matplotlib, seaborn, plotly
-- **Environment:** Jupyter Notebook
+- **Web Framework**: Django 5, Waitress (Windows), Gunicorn (Linux/Cloud), WhiteNoise
+- **Machine Learning**: Scikit-Learn, MLflow, Imbalanced-Learn (SMOTE), Joblib, Pandas, NumPy
+- **Frontend & UI**: HTML5, Vanilla CSS3 (Glassmorphism & Bento UI), Vanilla JavaScript, Chart.js, FontAwesome
+- **Notebook & Reporting**: Jupyter Notebook, Nbconvert
 
+---
+
+## License
+
+Distributed under the MIT License. Built by [Ansh Agarwal](https://github.com/Ansh-0815).

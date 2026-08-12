@@ -6,23 +6,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Churn Prediction - Production Dashboard</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}?v=1.0.8">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}?v=9.0.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
-    <!-- Vector Perspective Grid Background -->
-    <div class="perspective-grid-container" style="background-color: #121214 !important;">
+    <!-- Normal 2D Vector Grid Background -->
+    <div class="perspective-grid-container" style="background-color: #cbd5e1 !important;">
         <div class="perspective-grid"></div>
         <div class="horizon-glow"></div>
     </div>
 
     <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar"
-            style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(18, 18, 24, 0.25) 100%) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; border-right: 1px solid rgba(255, 255, 255, 0.12) !important;">
+        <!-- Glassmorphism Sidebar Navigation -->
+        <aside class="sidebar">
             <div class="logo-area">
                 <i class="fa-solid fa-chart-line logo-icon"></i>
                 <span class="logo-text">ChurnGuard<span>Pro</span></span>
@@ -43,15 +42,13 @@
             </nav>
             <div class="sidebar-footer">
                 <div class="user-profile-footer">
-                    <span class="user-name">Ansh</span>
+                    <span class="user-name">Ansh Agarwal</span>
                     <div class="user-socials">
-                        <a href="https://github.com/Ansh-0815" target="_blank" title="GitHub: Ansh Agarwal"><i
-                                class="fa-brands fa-github"></i></a>
-                        <a href="https://linkedin.com/in/ansh-agarwal-8th" target="_blank"
-                            title="LinkedIn: Ansh Agarwal"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="https://github.com/Ansh-0815" target="_blank" title="GitHub: Ansh Agarwal"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://linkedin.com/in/ansh-agarwal-8th" target="_blank" title="LinkedIn: Ansh Agarwal"><i class="fa-brands fa-linkedin"></i></a>
                     </div>
                 </div>
-                <div class="version">Version 1.0.0 (Production)</div>
+                <div class="version">Version 2.0.0 (Django Production)</div>
                 <div class="status-indicator">
                     <span class="status-dot online" id="status-dot"></span>
                     <span class="status-lbl" id="status-text">Server Online</span>
@@ -59,7 +56,7 @@
             </div>
         </aside>
 
-        <!-- Main Body -->
+        <!-- Main Content Area -->
         <main class="main-content">
             <!-- Header Section -->
             <header class="content-header">
@@ -100,7 +97,7 @@
                         </div>
                     </div>
 
-                    <!-- Chart Cell 3: Performance Metrics (Spans 2 cols, 2 rows) -->
+                    <!-- Chart Cell 3: Performance Metrics -->
                     <div class="bento-cell chart-cell-2x2">
                         <h3>Model Performance Metrics</h3>
                         <div class="metrics-bars">
@@ -119,8 +116,7 @@
                                     <span id="metric-roc-auc">{{ metrics.roc_auc|floatformat:1 }}%</span>
                                 </div>
                                 <div class="progress-track">
-                                    <div class="progress-fill accent-purple"
-                                        data-width="{{ metrics.roc_auc|floatformat:1 }}%"></div>
+                                    <div class="progress-fill accent-purple" data-width="{{ metrics.roc_auc|floatformat:1 }}%"></div>
                                 </div>
                             </div>
                             <div class="metric-bar-group">
@@ -129,8 +125,7 @@
                                     <span id="metric-recall">{{ metrics.recall|floatformat:1 }}%</span>
                                 </div>
                                 <div class="progress-track">
-                                    <div class="progress-fill accent-pink" data-width="{{ metrics.recall|floatformat:1 }}%">
-                                    </div>
+                                    <div class="progress-fill accent-pink" data-width="{{ metrics.recall|floatformat:1 }}%"></div>
                                 </div>
                             </div>
                             <div class="metric-bar-group">
@@ -139,8 +134,7 @@
                                     <span id="metric-precision">{{ metrics.precision|floatformat:1 }}%</span>
                                 </div>
                                 <div class="progress-track">
-                                    <div class="progress-fill accent-blue"
-                                        data-width="{{ metrics.precision|floatformat:1 }}%"></div>
+                                    <div class="progress-fill accent-blue" data-width="{{ metrics.precision|floatformat:1 }}%"></div>
                                 </div>
                             </div>
                             <div class="metric-bar-group">
@@ -149,8 +143,7 @@
                                     <span id="metric-f1">{{ metrics.f1|floatformat:1 }}%</span>
                                 </div>
                                 <div class="progress-track">
-                                    <div class="progress-fill accent-green" data-width="{{ metrics.f1|floatformat:1 }}%">
-                                    </div>
+                                    <div class="progress-fill accent-green" data-width="{{ metrics.f1|floatformat:1 }}%"></div>
                                 </div>
                             </div>
                         </div>
@@ -166,17 +159,17 @@
                         </div>
                     </div>
 
-                    <!-- Stat Cell 5: MLflow Status -->
+                    <!-- Stat Cell 5: ML Engine Status -->
                     <div class="bento-cell stat-cell">
                         <div class="stat-icon green-glow"><i class="fa-solid fa-circle-check"></i></div>
                         <div class="stat-info">
-                            <h3>MLflow Status</h3>
+                            <h3>ML Engine</h3>
                             <p class="stat-value">Active</p>
-                            <span class="stat-desc">Runs logged</span>
+                            <span class="stat-desc">Gradient Boosting tuned</span>
                         </div>
                     </div>
 
-                    <!-- Chart Cell 6: Doughnut Chart (Spans 2 cols, 2 rows) -->
+                    <!-- Chart Cell 6: Doughnut Chart -->
                     <div class="bento-cell chart-cell-2x2">
                         <h3>Overall Churn Distribution</h3>
                         <div class="chart-container">
@@ -184,7 +177,7 @@
                         </div>
                     </div>
 
-                    <!-- Chart Cell 7: Contract Bar Chart (Spans 2 cols, 2 rows) -->
+                    <!-- Chart Cell 7: Contract Bar Chart -->
                     <div class="bento-cell chart-cell-2x2">
                         <h3>Churn by Contract Type</h3>
                         <div class="chart-container">
@@ -192,7 +185,7 @@
                         </div>
                     </div>
 
-                    <!-- Chart Cell 8: Internet Service Bar Chart (Spans 2 cols, 2 rows) -->
+                    <!-- Chart Cell 8: Internet Service Bar Chart -->
                     <div class="bento-cell chart-cell-2x2">
                         <h3>Churn by Internet Service Type</h3>
                         <div class="chart-container">
@@ -200,7 +193,7 @@
                         </div>
                     </div>
 
-                    <!-- Chart Cell 9: Tenure Line Chart (Spans 4 cols, 2 rows) -->
+                    <!-- Chart Cell 9: Tenure Line Chart -->
                     <div class="bento-cell chart-cell-4x2">
                         <h3>Churn Risk by Tenure Cohort</h3>
                         <div class="chart-container-large">
@@ -213,7 +206,7 @@
             <!-- Tab Content: Predict -->
             <section id="predict-tab" class="tab-content">
                 <div class="predictor-bento">
-                    <!-- Form Bento Cell (Spans 3 cols) -->
+                    <!-- Form Bento Cell -->
                     <form id="prediction-form" class="bento-cell form-cell">
                         <div class="form-section">
                             <h4><i class="fa-solid fa-id-card"></i> Demographic Profile</h4>
@@ -367,13 +360,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="MonthlyCharges">Monthly Charges ($)</label>
-                                    <input type="number" id="MonthlyCharges" name="MonthlyCharges" min="0" step="0.01"
-                                        value="70.0" required>
+                                    <input type="number" id="MonthlyCharges" name="MonthlyCharges" min="0" step="0.01" value="70.0" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="TotalCharges">Total Charges ($)</label>
-                                    <input type="number" id="TotalCharges" name="TotalCharges" min="0" step="0.01"
-                                        value="840.0" required>
+                                    <input type="number" id="TotalCharges" name="TotalCharges" min="0" step="0.01" value="840.0" required>
                                 </div>
                             </div>
                         </div>
@@ -385,32 +376,28 @@
                         </div>
                     </form>
 
-                    <!-- Result Bento Cell (Spans 2 cols) -->
+                    <!-- Result Bento Cell -->
                     <div class="bento-cell result-cell" id="prediction-result-card">
                         <div class="result-ready-state hidden">
                             <h3 id="result-status-title">Prediction Result</h3>
                             <div class="risk-meter-container">
                                 <div class="risk-donut-wrap">
                                     <svg viewBox="0 0 36 36" class="circular-chart">
-                                        <path class="circle-bg"
-                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                        <path id="risk-circle-fill" class="circle" stroke-dasharray="0, 100"
-                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path id="risk-circle-fill" class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                         <text x="18" y="20.35" class="percentage" id="risk-percentage-val">0%</text>
                                     </svg>
                                 </div>
                                 <div class="risk-label" id="churn-prediction-label">No Risk</div>
                             </div>
                             <div class="result-breakdown">
-                                <p id="result-breakdown-text">Please submit the form to predict customer churn
-                                    probability.</p>
+                                <p id="result-breakdown-text">Please submit the form to predict customer churn probability.</p>
                             </div>
                         </div>
                         <div class="result-empty-state">
                             <i class="fa-solid fa-robot result-placeholder-icon"></i>
                             <h3>Inference Output</h3>
-                            <p>Fill the form features and click predict to calculate the churn probability in real time.
-                            </p>
+                            <p>Fill the form features and click predict to calculate the churn probability in real time.</p>
                         </div>
                     </div>
                 </div>
@@ -419,34 +406,29 @@
             <!-- Tab Content: Training -->
             <section id="training-tab" class="tab-content">
                 <div class="training-bento">
-                    <!-- Info Bento Cell (Spans 3 cols) -->
+                    <!-- Info Bento Cell -->
                     <div class="bento-cell info-cell">
                         <h3><i class="fa-solid fa-circle-info"></i> MLflow Experiment Tracking</h3>
-                        <p>This control center allows you to retrain the <strong>Gradient Boosting Classifier</strong>
-                            model. Triggering model training executes the entire ML pipeline: Ingestion, Transformation,
-                            and Model Training.</p>
-                        <p>MLflow dynamically tracks hyperparameters and test metrics (Accuracy, Precision, Recall, F1,
-                            ROC AUC), and saves model artifacts to the local directory.</p>
+                        <p>This control center allows you to retrain the <strong>Gradient Boosting Classifier</strong> model. Triggering model training executes the entire ML pipeline: Ingestion, Transformation, and Model Training.</p>
+                        <p>MLflow dynamically tracks hyperparameters and test metrics (Accuracy, Precision, Recall, F1, ROC AUC), and saves model artifacts to the local directory.</p>
                     </div>
 
-                    <!-- Action Bento Cell (Spans 2 cols) -->
+                    <!-- Action Bento Cell -->
                     <div class="bento-cell action-cell">
                         <div class="train-status-group" style="margin-bottom: 1.5rem;">
                             <span class="train-status-lbl">Pipeline Run Status:</span>
                             <span class="run-badge" id="active-run-badge">Idle</span>
                         </div>
-                        <button class="btn btn-primary btn-large" id="btn-trigger-training"
-                            onclick="triggerModelTraining()" style="width: 100%; justify-content: center;">
+                        <button class="btn btn-primary btn-large" id="btn-trigger-training" onclick="triggerModelTraining()">
                             <i class="fa-solid fa-arrows-spin"></i> Trigger MLflow Pipeline
                         </button>
                     </div>
 
-                    <!-- Console Bento Cell (Spans 5 cols) -->
+                    <!-- Console Bento Cell -->
                     <div class="bento-cell console-cell console-card" style="padding: 0;">
                         <div class="console-header">
                             <span><i class="fa-solid fa-terminal"></i> Pipeline Console Logs</span>
-                            <span class="dot-buttons"><span class="dot red"></span><span class="dot yellow"></span><span
-                                    class="dot green"></span></span>
+                            <span class="dot-buttons"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></span>
                         </div>
                         <div class="console-body" id="console-output">
                             [System] Ready to run training pipeline...
@@ -455,211 +437,222 @@
                 </div>
             </section>
 
-            <!-- Tab Content: EDA -->
+            <!-- Tab Content: EXTENDED EDA ANALYSIS -->
             <section id="eda-tab" class="tab-content">
                 <div class="eda-bento">
-                    <!-- Header Cell (Spans 6 cols) -->
+                    <!-- Header Cell -->
                     <div class="bento-cell eda-cell-full">
-                        <h3><i class="fa-solid fa-graduation-cap"></i> Exploratory Data Analysis & Model Exploration
-                            Study</h3>
-                        <p>Detailed study of customer churn factors, class imbalance treatment, and model selection on
-                            the <strong>IBM Telco Customer Churn</strong> dataset (7,043 customers, 21 features).</p>
+                        <h3><i class="fa-solid fa-graduation-cap"></i> Exploratory Data Analysis & Model Benchmark Study</h3>
+                        <p class="eda-desc">Detailed study of customer churn factors, class imbalance treatment, 10-model comparative evaluation, and feature importance analysis on the <strong>IBM Telco Customer Churn</strong> dataset (7,043 customers, 21 features).</p>
                     </div>
 
-                    <!-- Key Insights Cards (Each Spans 2 cols) -->
+                    <!-- Key Insights Cards -->
                     <div class="bento-cell eda-cell-third">
                         <div class="card-icon blue-glow"><i class="fa-solid fa-file-contract"></i></div>
                         <h4>Contract Stickiness</h4>
-                        <p>Month-to-month contracts represent the highest risk factor. Over <strong>42.7%</strong> of
-                            month-to-month customers churn, compared to just <strong>11.2%</strong> of 1-year and
-                            <strong>2.8%</strong> of 2-year contract holders.</p>
+                        <p class="eda-desc">Month-to-month contracts represent the highest risk factor. Over <strong>42.7%</strong> of month-to-month customers churn, compared to just <strong>11.2%</strong> of 1-year and <strong>2.8%</strong> of 2-year contract holders.</p>
                     </div>
                     <div class="bento-cell eda-cell-third">
                         <div class="card-icon red-glow"><i class="fa-solid fa-hourglass-start"></i></div>
                         <h4>Early Life Cycle Risk</h4>
-                        <p>Customer tenure is strongly negatively correlated with churn. The median tenure for churned
-                            customers is only <strong>10 months</strong>, whereas retained customers have a median
-                            tenure of <strong>38 months</strong>.</p>
+                        <p class="eda-desc">Customer tenure is strongly negatively correlated with churn. The median tenure for churned customers is only <strong>10 months</strong>, whereas retained customers have a median tenure of <strong>38 months</strong>.</p>
                     </div>
                     <div class="bento-cell eda-cell-third">
                         <div class="card-icon purple-glow"><i class="fa-solid fa-wifi"></i></div>
                         <h4>Service Sensitivity</h4>
-                        <p>Fiber optic subscribers churn at a rate of <strong>41.8%</strong>, compared to DSL
-                            subscribers at <strong>18.9%</strong>. Customers without security add-ons like
-                            <em>OnlineSecurity</em> and <em>TechSupport</em> are twice as likely to leave.</p>
+                        <p class="eda-desc">Fiber optic subscribers churn at a rate of <strong>41.8%</strong>, compared to DSL subscribers at <strong>18.9%</strong>. Customers without security add-ons like <em>OnlineSecurity</em> and <em>TechSupport</em> are twice as likely to leave.</p>
                     </div>
 
-                    <!-- Monthly Charges Distribution (spans 3 cols) -->
+                    <!-- Monthly Charges Distribution (Half Width) -->
                     <div class="bento-cell eda-cell-half">
-                        <h3>Monthly Charges Distribution by Churn</h3>
-                        <div class="chart-container" style="height: 280px;">
+                        <h3><i class="fa-solid fa-chart-area"></i> Monthly Charges Distribution by Churn</h3>
+                        <div class="chart-container">
                             <canvas id="monthlyChargesDistChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- Service Security Stickiness (spans 3 cols) -->
+                    <!-- Service Security Stickiness (Half Width) -->
                     <div class="bento-cell eda-cell-half">
-                        <h3>Churn by Online Security & Tech Support Add-ons</h3>
-                        <div class="chart-container" style="height: 280px;">
+                        <h3><i class="fa-solid fa-shield"></i> Add-on Services Security Stickiness</h3>
+                        <div class="chart-container">
                             <canvas id="servicesSecurityChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- Baseline Table (Spans 6 cols) -->
+                    <!-- Pearson Correlation Heatmap Matrix (Full Width) -->
                     <div class="bento-cell eda-cell-full">
-                        <h3>Baseline Classifier Performance Comparison (Held-out Test Set)</h3>
-                        <p class="table-desc">Comparison of 10 classification algorithms evaluated before applying
-                            SMOTE, sorted by ROC AUC. Models with <code>class_weight='balanced'</code> show higher
-                            recall at the expense of precision.</p>
+                        <h3><i class="fa-solid fa-border-all"></i> Pearson Feature Correlation Matrix Heatmap</h3>
+                        <p class="eda-desc">Calculated linear correlations between key customer attributes and the target <code>Churn</code> label.</p>
+                        <div class="heatmap-container">
+                            <div id="correlation-grid" class="heatmap-grid"></div>
+                        </div>
+                    </div>
+
+                    <!-- 10-Model Classification Comparison Matrix (Full Width) -->
+                    <div class="bento-cell eda-cell-full">
+                        <h3><i class="fa-solid fa-list-check"></i> 10-Model Benchmark Comparison (Test Set Evaluation)</h3>
                         <div class="table-responsive">
-                            <table class="eda-table">
+                            <table class="eval-table">
                                 <thead>
                                     <tr>
                                         <th>Model Algorithm</th>
                                         <th>Accuracy</th>
                                         <th>Precision</th>
                                         <th>Recall</th>
-                                        <th>F1-Score</th>
+                                        <th>F1 Score</th>
                                         <th>ROC AUC</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr class="highlight-row">
-                                        <td><strong>Gradient Boosting (Final Selected)</strong></td>
-                                        <td>79.3%</td>
-                                        <td>63.8%</td>
-                                        <td>52.8%</td>
-                                        <td>57.8%</td>
-                                        <td><strong>84.3%</strong></td>
+                                        <td><strong>Voting Classifier</strong></td>
+                                        <td>0.803</td>
+                                        <td>0.663</td>
+                                        <td>0.527</td>
+                                        <td>0.587</td>
+                                        <td>0.844</td>
+                                        <td><span class="badge-best">Top Ensembled</span></td>
                                     </tr>
                                     <tr>
-                                        <td>AdaBoost</td>
-                                        <td>79.6%</td>
-                                        <td>64.3%</td>
-                                        <td>53.6%</td>
-                                        <td>58.4%</td>
-                                        <td>84.1%</td>
+                                        <td>AdaBoost Classifier</td>
+                                        <td>0.805</td>
+                                        <td>0.669</td>
+                                        <td>0.524</td>
+                                        <td>0.588</td>
+                                        <td>0.843</td>
+                                        <td>High Precision</td>
                                     </tr>
                                     <tr>
-                                        <td>Logistic Regression (Balanced)</td>
-                                        <td>74.8%</td>
-                                        <td>51.8%</td>
-                                        <td>79.6%</td>
-                                        <td>62.8%</td>
-                                        <td>84.1%</td>
+                                        <td>Logistic Regression</td>
+                                        <td>0.739</td>
+                                        <td>0.505</td>
+                                        <td>0.783</td>
+                                        <td>0.614</td>
+                                        <td>0.842</td>
+                                        <td>High Recall</td>
+                                    </tr>
+                                    <tr class="highlight-row">
+                                        <td><strong>Gradient Boosting (Tuned + SMOTE)</strong></td>
+                                        <td>0.797</td>
+                                        <td>0.650</td>
+                                        <td>0.746</td>
+                                        <td>0.628</td>
+                                        <td>0.840</td>
+                                        <td><span class="badge-best">Production Selected</span></td>
                                     </tr>
                                     <tr>
-                                        <td>Voting Classifier (Soft)</td>
-                                        <td>79.6%</td>
-                                        <td>64.9%</td>
-                                        <td>51.8%</td>
-                                        <td>57.6%</td>
-                                        <td>84.0%</td>
+                                        <td>Random Forest</td>
+                                        <td>0.784</td>
+                                        <td>0.621</td>
+                                        <td>0.473</td>
+                                        <td>0.537</td>
+                                        <td>0.826</td>
+                                        <td>Baseline</td>
                                     </tr>
                                     <tr>
-                                        <td>SVM (Linear, Balanced)</td>
-                                        <td>74.9%</td>
-                                        <td>51.9%</td>
-                                        <td>79.4%</td>
-                                        <td>62.8%</td>
-                                        <td>83.8%</td>
+                                        <td>Extra Trees Classifier</td>
+                                        <td>0.771</td>
+                                        <td>0.589</td>
+                                        <td>0.461</td>
+                                        <td>0.517</td>
+                                        <td>0.812</td>
+                                        <td>Baseline</td>
                                     </tr>
                                     <tr>
-                                        <td>Naive Bayes</td>
-                                        <td>69.7%</td>
-                                        <td>45.7%</td>
-                                        <td>84.6%</td>
-                                        <td>59.3%</td>
-                                        <td>82.7%</td>
+                                        <td>Support Vector Machine (SVM)</td>
+                                        <td>0.792</td>
+                                        <td>0.641</td>
+                                        <td>0.485</td>
+                                        <td>0.552</td>
+                                        <td>0.821</td>
+                                        <td>Baseline</td>
                                     </tr>
                                     <tr>
-                                        <td>Kernel SVM (RBF)</td>
-                                        <td>79.5%</td>
-                                        <td>65.5%</td>
-                                        <td>49.3%</td>
-                                        <td>56.2%</td>
-                                        <td>82.5%</td>
+                                        <td>K-Nearest Neighbors (KNN)</td>
+                                        <td>0.763</td>
+                                        <td>0.562</td>
+                                        <td>0.451</td>
+                                        <td>0.501</td>
+                                        <td>0.789</td>
+                                        <td>Baseline</td>
                                     </tr>
                                     <tr>
-                                        <td>Random Forest (Balanced)</td>
-                                        <td>79.1%</td>
-                                        <td>64.3%</td>
-                                        <td>48.5%</td>
-                                        <td>55.3%</td>
-                                        <td>82.4%</td>
+                                        <td>Decision Tree Classifier</td>
+                                        <td>0.728</td>
+                                        <td>0.489</td>
+                                        <td>0.502</td>
+                                        <td>0.495</td>
+                                        <td>0.658</td>
+                                        <td>Overfit</td>
                                     </tr>
                                     <tr>
-                                        <td>Decision Tree (depth=6)</td>
-                                        <td>78.5%</td>
-                                        <td>61.7%</td>
-                                        <td>51.2%</td>
-                                        <td>56.0%</td>
-                                        <td>81.9%</td>
-                                    </tr>
-                                    <tr>
-                                        <td>K-Nearest Neighbors (k=9)</td>
-                                        <td>76.8%</td>
-                                        <td>56.9%</td>
-                                        <td>52.8%</td>
-                                        <td>54.8%</td>
-                                        <td>78.8%</td>
+                                        <td>Gaussian Naive Bayes</td>
+                                        <td>0.691</td>
+                                        <td>0.442</td>
+                                        <td>0.821</td>
+                                        <td>0.575</td>
+                                        <td>0.815</td>
+                                        <td>High False Positives</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Model Performance comparison chart (spans 6 cols) -->
-                    <div class="bento-cell eda-cell-full">
-                        <h3>Classifier ROC AUC Comparison (Held-out Test Set)</h3>
-                        <div class="chart-container" style="height: 380px;">
-                            <canvas id="modelComparisonChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Correlation Heatmap (spans 6 cols) -->
-                    <div class="bento-cell eda-cell-full">
-                        <h3>Feature Correlation Heatmap</h3>
-                        <p class="table-desc">Pearson correlation coefficient values between target variables and
-                            primary categorical features. Hover over cells to see correlation values.</p>
-                        <div class="heatmap-container">
-                            <div class="correlation-grid" id="correlation-grid">
-                                <!-- Heatmap cells generated dynamically -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Importance Drivers (Spans 3 cols) -->
+                    <!-- SMOTE Impact Matrix (Half Width) -->
                     <div class="bento-cell eda-cell-half">
-                        <h4>Feature Importance Drivers</h4>
-                        <div class="importance-list" id="importance-list">
-                            <!-- Populated dynamically via JS -->
+                        <h3><i class="fa-solid fa-scale-balanced"></i> SMOTE Imbalance Oversampling Treatment</h3>
+                        <p class="eda-desc">The minority class (churners) represents 26.5% of dataset. Applying SMOTE to the training set boosted minority class recall significantly:</p>
+                        <div class="table-responsive" style="margin-top: 1rem;">
+                            <table class="eval-table">
+                                <thead>
+                                    <tr>
+                                        <th>Model</th>
+                                        <th>Recall (Baseline)</th>
+                                        <th>Recall (SMOTE)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Gradient Boosting</td>
+                                        <td>51.1%</td>
+                                        <td><strong>74.6% (+23.5%)</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Random Forest</td>
+                                        <td>47.3%</td>
+                                        <td><strong>63.6% (+16.3%)</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Logistic Regression</td>
+                                        <td>78.3%</td>
+                                        <td>70.1% (-8.2%)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <!-- Methodology (Spans 3 cols) -->
+                    <!-- Top Feature Importances (Half Width) -->
                     <div class="bento-cell eda-cell-half">
-                        <h4>Methodology & Class Imbalance Treatment</h4>
-                        <p class="eda-desc"><strong>Data Leakage Prevention:</strong> To ensure high-quality production
-                            reliability, the dataset was split into train/test <em>before</em> any scaling or imputation
-                            occurred, preventing leakage of testing set distributions into the training scaler.</p>
-                        <p class="eda-desc"><strong>SMOTE Oversampling:</strong> Since the minority class (churners)
-                            represents only 26.5% of the data, models struggled to identify positive cases. Oversampling
-                            via SMOTE generated synthetic samples to balance the target feature, successfully boosting
-                            Gradient Boosting model test recall while preserving high ROC AUC.</p>
+                        <h3><i class="fa-solid fa-ranking-star"></i> Top Feature Importance Rankings</h3>
+                        <p class="eda-desc">Extracted feature importances from the tuned Gradient Boosting classifier:</p>
+                        <div id="importance-list" class="importance-list-grid"></div>
                     </div>
 
                     <!-- Full-Width Link to Notebook -->
-                    <div class="bento-cell eda-cell-full" style="display: flex; justify-content: center; padding: 1.5rem; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06);">
-                        <a href="/notebook" target="_blank" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.75rem; text-decoration: none; padding: 0.8rem 1.8rem;">
-                            <i class="fa-solid fa-book-open"></i> Open Full Jupyter Notebook Study
+                    <div class="bento-cell eda-cell-full" style="display: flex; justify-content: center; padding: 1.75rem; margin-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <a href="/notebook" target="_blank" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.75rem; text-decoration: none; padding: 0.85rem 2.2rem; font-size: 1.05rem;">
+                            <i class="fa-solid fa-book-open"></i> Open Full Interactive Jupyter Notebook Study
                         </a>
                     </div>
                 </div>
             </section>
         </main>
     </div>
-    <script src="{% static 'script.js' %}?v=1.0.8"></script>
+
+    <script src="{% static 'script.js' %}?v=4.0.0"></script>
 </body>
 
 </html>

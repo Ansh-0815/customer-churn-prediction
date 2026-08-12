@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 db.sqlite3
 staticfiles/
+mlruns/
+models/training.log
 
 
 # C extensions

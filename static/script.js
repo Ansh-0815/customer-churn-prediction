@@ -102,25 +102,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 2. Initialize Chart.js
-    
-    // Chart options defaults for professional dark theme
+    // Chart options defaults for professional Greyish-White theme
     const chartDefaults = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                labels: { color: document.body.classList.contains('light-theme') ? '#64748b' : '#94a3b8', font: { family: 'Outfit', size: 12, weight: '500' } }
+                labels: { color: '#475569', font: { family: 'Outfit', size: 12, weight: '600' } }
             }
         },
         scales: {
             x: {
-                ticks: { color: document.body.classList.contains('light-theme') ? '#64748b' : '#94a3b8', font: { family: 'Outfit' } },
-                grid: { color: document.body.classList.contains('light-theme') ? '#e2e8f0' : 'rgba(255, 255, 255, 0.05)' }
+                ticks: { color: '#475569', font: { family: 'Outfit' } },
+                grid: { color: '#e2e8f0' }
             },
             y: {
-                ticks: { color: document.body.classList.contains('light-theme') ? '#64748b' : '#94a3b8', font: { family: 'Outfit' } },
-                grid: { color: document.body.classList.contains('light-theme') ? '#e2e8f0' : 'rgba(255, 255, 255, 0.05)' }
+                ticks: { color: '#475569', font: { family: 'Outfit' } },
+                grid: { color: '#e2e8f0' }
             }
         }
     };
@@ -133,9 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
             labels: ['Retained (No Churn)', 'Churned'],
             datasets: [{
                 data: [5174, 1869],
-                backgroundColor: ['#3b82f6', '#ef4444'],
-                borderWidth: 2,
-                borderColor: '#0a0a0c',
+                backgroundColor: ['#10b981', '#ef4444'],
+                borderWidth: 3,
+                borderColor: '#0f172a',
                 hoverOffset: 6
             }]
         },
@@ -145,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             plugins: {
                 legend: {
                     position: 'bottom',
-                    labels: { color: document.body.classList.contains('light-theme') ? '#64748b' : '#94a3b8', font: { family: 'Outfit', size: 12, weight: '500' } }
+                    labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' } }
                 }
             }
         }
@@ -161,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     label: 'Retained',
                     data: [2220, 1307, 1647],
-                    backgroundColor: '#3b82f6',
+                    backgroundColor: '#10b981',
                     borderRadius: 6
                 },
                 {
@@ -172,7 +170,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             ]
         },
-        options: chartDefaults
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' } }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans' } },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                },
+                y: {
+                    ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans' } },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                }
+            }
+        }
     });
 
     // 2c. Churn by Internet Service Type Bar Chart
@@ -185,18 +201,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     label: 'Retained',
                     data: [1962, 1799, 1413],
-                    backgroundColor: '#0d9488',
+                    backgroundColor: '#6366f1',
                     borderRadius: 6
                 },
                 {
                     label: 'Churned',
                     data: [459, 1297, 113],
-                    backgroundColor: '#d946ef',
+                    backgroundColor: '#06b6d4',
                     borderRadius: 6
                 }
             ]
         },
-        options: chartDefaults
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' } }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans' } },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                },
+                y: {
+                    ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans' } },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                }
+            }
+        }
     });
 
     // 2d. Churn Risk by Tenure Cohort Line Chart

@@ -1,6 +1,6 @@
 # Customer Churn Prediction - Production Django Dashboard
 
-An end-to-end Machine Learning & Web Production System built with **Django 5**, **MLflow**, and **Scikit-Learn** that predicts telecom customer churn in real time and provides an executive intelligence dashboard with automated retraining and embedded EDA notebook study.
+An end-to-end Machine Learning & Web Production System built with **Django 5**, **MLflow**, and **Scikit-Learn** that predicts telecom customer churn in real time and provides an executive intelligence dashboard with automated retraining and an extended EDA notebook study.
 
 ---
 
@@ -15,12 +15,12 @@ An end-to-end Machine Learning & Web Production System built with **Django 5**, 
 ### 3. MLflow Model Retraining & SSE Log Streaming (`/train`)
 ![MLflow Model Retraining Console](static/assets/model_training.png)
 
-### 4. Exploratory Data Analysis & Feature Exploration (`/eda`)
+### 4. Extended Exploratory Data Analysis & Feature Exploration (`/eda`)
 ![Exploratory Data Analysis Dashboard](static/assets/eda_analysis.png)
 
 ---
 
-## Jupyter Notebook EDA & Model Study Charts
+## Extended Exploratory Data Analysis & Notebook Charts
 
 Extracted directly from [`notebook/churn_prediction.ipynb`](notebook/churn_prediction.ipynb):
 
@@ -44,8 +44,9 @@ Extracted directly from [`notebook/churn_prediction.ipynb`](notebook/churn_predi
 
 ## Executive Summary
 
-- **Production Web Dashboard**: Built with Django 5, featuring a sleek, responsive Bento-Grid UI with real-time customer risk intelligence, MLflow model telemetry, and interactive Chart.js visualizations.
-- **Instant Risk Predictor**: Form-driven REST API (`/predict`) providing instant single-customer churn risk scoring and risk-meter visualization.
+- **Frosted Glassmorphism Executive Dashboard**: Built with Django 5, featuring semi-transparent frosted acrylic surfaces (`backdrop-filter: blur(18px) saturate(190%)`), inset glass highlights, flat 2D vector grid canvas, and real-time risk scoring.
+- **Extended EDA Analysis & Correlation Matrix**: Features a Pearson feature correlation heatmap matrix, 10-model benchmark comparison table, SMOTE oversampling treatment matrix, and service security stickiness analytics.
+- **Instant Risk Predictor**: Form-driven REST API (`/predict`) providing instant single-customer churn risk scoring and circular SVG risk-meter visualization.
 - **Live Retraining & SSE Telemetry**: Trigger model retraining directly from the UI (`/train`) with real-time console log streaming via Server-Sent Events (`/train/stream`).
 - **Embedded Jupyter Notebook Study**: Dynamically converts and renders the project's exploratory data analysis and model comparison notebook (`notebook/churn_prediction.ipynb`) into HTML (`/notebook`).
 - **ML Model Performance**: Evaluated 10 classification algorithms; tuned **Gradient Boosting Classifier** with **SMOTE** oversampling to achieve high recall on churners while maintaining **ROC AUC ≈ 0.84**.
@@ -79,8 +80,8 @@ customer-churn-prediction/
 │   └── index.html              # Bento-Grid executive dashboard template
 │
 ├── static/
-│   ├── style.css               # Modern glassmorphism & dark perspective CSS theme
-│   ├── script.js               # Dynamic charts, SSE stream reader, and predictor logic
+│   ├── style.css               # Frosted Glassmorphism design system & CSS theme
+│   ├── script.js               # Dynamic charts, SSE stream reader, and correlation heatmap logic
 │   └── assets/                 # Captured web application screenshots & notebook charts
 │
 ├── data/
@@ -189,7 +190,7 @@ This repository includes a pre-configured `render.yaml` blueprint for 1-click cl
 
 - **Web Framework**: Django 5, Waitress (Windows), Gunicorn (Linux/Cloud), WhiteNoise
 - **Machine Learning**: Scikit-Learn, MLflow, Imbalanced-Learn (SMOTE), Joblib, Pandas, NumPy
-- **Frontend & UI**: HTML5, Vanilla CSS3 (Glassmorphism & Bento UI), Vanilla JavaScript, Chart.js, FontAwesome
+- **Frontend & UI**: HTML5, Vanilla CSS3 (Frosted Glassmorphism & Compact Bento UI), Vanilla JavaScript, Chart.js, FontAwesome
 - **Notebook & Reporting**: Jupyter Notebook, Nbconvert
 
 ---

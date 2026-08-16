@@ -6,6 +6,8 @@ db.sqlite3
 staticfiles/
 mlruns/
 models/training.log
+EXPLANATION_PROJECT.md
+EXPLANATION_NOTEBOOK.md
 
 
 # C extensions

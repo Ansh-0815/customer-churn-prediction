@@ -1,1 +1,1 @@
-web: gunicorn churn_project.wsgi:application
+web: gunicorn app:app

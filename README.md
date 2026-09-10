@@ -1,17 +1,14 @@
-# Customer Churn Prediction - Production Django Dashboard
+# Customer Churn Prediction - Production Flask Dashboard
 
-[![Live Production App](https://img.shields.io/badge/Live_App-Render_Production-00B4D8?style=for-the-badge&logo=render&logoColor=white)](https://customer-churn-prediction-589p.onrender.com)
-[![Interactive Notebook Study](https://img.shields.io/badge/Notebook_Study-Jupyter_HTML-FF6F61?style=for-the-badge&logo=jupyter&logoColor=white)](https://customer-churn-prediction-589p.onrender.com/notebook)
+[![Framework: Flask](https://img.shields.io/badge/Framework-Flask_3.0-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Deployment: Vercel](https://img.shields.io/badge/Deployment-Vercel_Serverless-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Ansh--0815%2Fcustomer--churn--prediction-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ansh-0815/customer-churn-prediction)
 
-An end-to-end Machine Learning & Web Production System built with **Django 5**, **MLflow**, and **Scikit-Learn** that predicts telecom customer churn in real time and provides an executive intelligence dashboard with automated retraining and an extended EDA notebook study.
-
-- 🌐 **Live Website URL**: **[https://customer-churn-prediction-589p.onrender.com](https://customer-churn-prediction-589p.onrender.com)**
-- 📖 **Live Notebook Study**: **[https://customer-churn-prediction-589p.onrender.com/notebook](https://customer-churn-prediction-589p.onrender.com/notebook)**
+An end-to-end Machine Learning & Web Production System built with **Flask**, **Vercel Serverless**, **MLflow**, and **Scikit-Learn** that predicts telecom customer churn in real time and provides an executive intelligence dashboard with automated retraining and an extended EDA notebook study.
 
 ---
 
-## Application Screenshots (Captured from Live Web Dashboard)
+## Application Screenshots (Captured from Web Dashboard)
 
 ### 1. Executive Churn Dashboard (`/`)
 ![Executive Churn Dashboard Overview](static/assets/dashboard_overview.png)
@@ -51,11 +48,12 @@ Extracted directly from [`notebook/churn_prediction.ipynb`](notebook/churn_predi
 
 ## Executive Summary
 
-- **Frosted Glassmorphism Executive Dashboard**: Built with Django 5, featuring semi-transparent frosted acrylic surfaces (`backdrop-filter: blur(18px) saturate(190%)`), inset glass highlights, flat 2D vector grid canvas, and real-time risk scoring.
+- **Flask Microservices Architecture**: Built with Flask, featuring ultra-fast response times, lightweight serverless architecture for Vercel deployment, semi-transparent frosted acrylic surfaces (`backdrop-filter: blur(18px) saturate(190%)`), inset glass highlights, flat 2D vector grid canvas, and real-time risk scoring.
+- **Vercel Zero Cold-Start Deployment**: Configured via `vercel.json` (`@vercel/python`) for instant serverless execution without Render spin-up delays.
 - **Extended EDA Analysis & Correlation Matrix**: Features a Pearson feature correlation heatmap matrix, 10-model benchmark comparison table, SMOTE oversampling treatment matrix, and service security stickiness analytics.
 - **Instant Risk Predictor**: Form-driven REST API (`/predict`) providing instant single-customer churn risk scoring and circular SVG risk-meter visualization.
 - **Live Retraining & SSE Telemetry**: Trigger model retraining directly from the UI (`/train`) with real-time console log streaming via Server-Sent Events (`/train/stream`).
-- **Embedded Jupyter Notebook Study**: Dynamically converts and renders the project's exploratory data analysis and model comparison notebook (`notebook/churn_prediction.ipynb`) into HTML (`/notebook`).
+- **Embedded Jupyter Notebook Study**: Renders the project's exploratory data analysis and model comparison notebook (`notebook/churn_prediction.ipynb`) into static HTML (`/notebook`).
 - **ML Model Performance**: Evaluated 10 classification algorithms; tuned **Gradient Boosting Classifier** with **SMOTE** oversampling to achieve high recall on churners while maintaining **ROC AUC ≈ 0.84**.
 
 ---
@@ -64,145 +62,74 @@ Extracted directly from [`notebook/churn_prediction.ipynb`](notebook/churn_predi
 
 ```
 customer-churn-prediction/
-├── manage.py                   # Django CLI management utility
+├── app.py                      # Core Flask Application & Serverless Web Handler
+├── vercel.json                 # Vercel deployment blueprint & Python builder routing
 ├── Procfile                    # Production Gunicorn entrypoint
-├── render.yaml                 # Render 1-click cloud deployment blueprint
-├── requirements.txt            # Python dependencies (Django, MLflow, Scikit-Learn, WhiteNoise)
+├── requirements.txt            # Python dependencies (Flask, MLflow, Scikit-Learn)
 ├── README.md                   # Project documentation
 │
-├── churn_project/              # Core Django Project Configuration
-│   ├── __init__.py
-│   ├── settings.py             # Django settings (WhiteNoise, env vars, static files)
-│   ├── urls.py                 # Root URL dispatcher
-│   ├── wsgi.py                 # WSGI entrypoint for production
-│   └── asgi.py                 # ASGI entrypoint
+├── src/                        # Modular Machine Learning Pipeline Engine
+│   └── customer_churn_prediction/
+│       ├── __init__.py
+│       ├── utils.py            # Utility functions (save/load pickle objects)
+│       ├── components/         # Pipeline Components
+│       │   ├── data_ingestion.py        # Loads raw CSV & splits train/test data
+│       │   ├── data_transformation.py   # Median imputation, One-Hot Encoding, StandardScaler, SMOTE
+│       │   └── model_tranier.py         # Fits tuned Gradient Boosting & logs to MLflow
+│       └── pipelines/          # Execution & Inference Pipelines
+│           ├── training_pipeline.py     # End-to-end retraining pipeline executor
+│           └── prediction_pipeline.py   # CustomData & PredictPipeline for API scoring
 │
-├── churn_app/                  # Django Web Application
-│   ├── __init__.py
-│   ├── apps.py                 # App configuration
-│   ├── views.py                # Views for /, /predict, /metrics, /train, /train/stream, /notebook
-│   └── urls.py                 # App URL route definitions
+├── data/                       # Dataset Storage
+│   └── Telco-Customer-Churn.csv # IBM Telco 7,043 Customer Records
 │
-├── templates/
-│   ├── index.html              # Bento-Grid executive dashboard template
-│   └── notebook.html           # Pre-compiled static notebook HTML template
+├── models/                     # Trained Artifacts & Telemetry
+│   ├── churn_model.pkl         # Serialized Gradient Boosting Model
+│   ├── scaler.pkl              # Serialized StandardScaler Instance
+│   ├── model_columns.pkl       # Feature Matrix Column Alignment List
+│   ├── metrics.json            # Model Evaluation Metrics JSON Log
+│   └── feature_importance.json # Gini Feature Importance Rankings
 │
-├── static/
-│   ├── style.css               # Frosted Glassmorphism design system & CSS theme
-│   ├── script.js               # Dynamic charts, SSE stream reader, and correlation heatmap logic
-│   └── assets/                 # Captured web application screenshots & notebook charts
+├── templates/                  # Jinja2 HTML Templates
+│   ├── index.html              # Frosted Glassmorphism Bento Dashboard
+│   └── notebook.html           # Pre-rendered Static Notebook Template
 │
-├── data/
-│   └── Telco-Customer-Churn.csv# IBM Telco Customer Churn dataset (7,043 rows, 21 columns)
+├── static/                     # CSS, JS & Image Assets
+│   ├── style.css               # Design System Stylesheet
+│   ├── script.js               # Client-Side Dynamic Routing & Chart Engine
+│   └── assets/                 # Screenshots & Dashboard Charts
 │
-├── models/
-│   ├── churn_model.pkl         # Final tuned Gradient Boosting model weights
-│   ├── scaler.pkl             # StandardScaler fit on training data
-│   ├── model_columns.pkl      # Training feature column order
-│   ├── metrics.json           # Model validation metrics
-│   └── feature_importance.json# Extracted feature importance values
-│
-└── notebook/
-    └── churn_prediction.ipynb # Full EDA and 10-model comparative study notebook
+└── notebook/                   # Research & Exploratory Analysis
+    └── churn_prediction.ipynb  # Comprehensive Jupyter Notebook Analysis
 ```
 
 ---
 
-## Features & Endpoints
+## Deploying to Vercel (1-Click Steps)
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/` | `GET` | **Executive Dashboard**: Displays key cohort stats, MLflow metrics, interactive Chart.js charts, and predictor form. |
-| `/predict` | `POST` | **Churn Risk API**: Accepts customer JSON payload and returns prediction (`Churn` / `No Churn`) and risk probability. |
-| `/metrics` | `GET` | **Model Telemetry API**: Serves current Accuracy, Precision, Recall, F1 Score, and ROC AUC metrics. |
-| `/train` | `POST` | **Retrain Pipeline**: Spawns background process executing `main.py` training pipeline. |
-| `/train/stream` | `GET` | **SSE Log Stream**: Streams real-time pipeline execution logs to console widget using Server-Sent Events. |
-| `/feature_importance` | `GET` | **Feature Ranking API**: Serves JSON of feature importances extracted from tuned model weights. |
-| `/notebook` | `GET` | **Embedded Notebook Study**: Renders `churn_prediction.ipynb` dynamically in HTML format using `nbconvert`. |
+1. **Install Vercel CLI** (or connect your GitHub repository on Vercel Dashboard):
+   ```bash
+   npm i -g vercel
+   ```
 
----
-
-## How to Run Locally
-
-### 1. Clone Repository & Setup Environment
-
-```bash
-git clone https://github.com/Ansh-0815/customer-churn-prediction
-cd customer-churn-prediction
-
-# Create and activate virtual environment
-python -m venv venv
-# On Windows:
-.\venv\Scripts\activate
-# On Linux/macOS:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### 2. Run Development Server
-
-```bash
-python manage.py runserver 5001
-```
-
-Open your browser and navigate to: **[http://127.0.0.1:5001/](http://127.0.0.1:5001/)**
-
-### 3. Run Windows Production Server (Waitress)
-
-```bash
-waitress-serve --port=5001 churn_project.wsgi:application
-```
-
-### 4. Run Linux Production Server (Gunicorn)
-
-```bash
-gunicorn churn_project.wsgi:application --bind 0.0.0.0:5001
-```
+2. **Deploy**:
+   ```bash
+   vercel --prod
+   ```
+   Vercel automatically detects `vercel.json`, installs dependencies from `requirements.txt`, and serves `app.py` via `@vercel/python`.
 
 ---
 
-## Deploying to Cloud (Render)
+## Running Locally
 
-This repository includes a pre-configured `render.yaml` blueprint for 1-click cloud deployment:
+1. **Activate Virtual Environment**:
+   ```bash
+   .\venv\Scripts\activate
+   ```
 
-1. Push your repository to **GitHub**.
-2. Log into [Render Dashboard](https://dashboard.render.com/) and click **New +** $\rightarrow$ **Blueprint**.
-3. Connect `Ansh-0815/customer-churn-prediction`.
-4. Render automatically applies the build command (`pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate`) and start command (`gunicorn churn_project.wsgi:application`).
+2. **Start Local Flask Server**:
+   ```bash
+   python app.py
+   ```
 
----
-
-## Machine Learning Methodology
-
-1. **Data Cleaning**: Handled missing `TotalCharges` entries for zero-tenure accounts via median imputation.
-2. **Feature Engineering**: Encoded categorical attributes and scaled numeric features using `StandardScaler` (fit exclusively on the training split to prevent data leakage).
-3. **Class Imbalance Treatment**: Applied **SMOTE** oversampling on the training set to address minority class imbalance (26.5% baseline churn rate).
-4. **Model Comparison**: Compared 10 classifiers across Accuracy, Precision, Recall, F1, and ROC AUC:
-   - *Gradient Boosting*
-   - *AdaBoost*
-   - *Logistic Regression*
-   - *Random Forest*
-   - *Extra Trees*
-   - *Support Vector Machine (SVM)*
-   - *K-Nearest Neighbors (KNN)*
-   - *Decision Tree*
-   - *Naive Bayes*
-   - *Voting Classifier*
-5. **Hyperparameter Tuning**: Applied `RandomizedSearchCV` on Gradient Boosting to optimize learning rate, tree depth, and estimators.
-
----
-
-## Tech Stack
-
-- **Web Framework**: Django 5, Waitress (Windows), Gunicorn (Linux/Cloud), WhiteNoise
-- **Machine Learning**: Scikit-Learn, MLflow, Imbalanced-Learn (SMOTE), Joblib, Pandas, NumPy
-- **Frontend & UI**: HTML5, Vanilla CSS3 (Frosted Glassmorphism & Compact Bento UI), Vanilla JavaScript, Chart.js, FontAwesome
-- **Notebook & Reporting**: Jupyter Notebook, Nbconvert
-
----
-
-## License
-
-Distributed under the MIT License. Built by [Ansh Agarwal](https://github.com/Ansh-0815).
+3. Open **[http://localhost:5000](http://localhost:5000)** in your browser.

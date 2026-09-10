@@ -3,17 +3,16 @@ import json
 import sys
 import time
 import subprocess
-from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods, require_GET, require_POST
+from flask import Flask, render_template, request, jsonify, Response, send_from_directory
 
 from src.customer_churn_prediction.pipelines.prediction_pipeline import PredictPipeline, CustomData
+
+app = Flask(__name__, static_folder='static', template_folder='templates')
 
 training_process = None
 
 def get_saved_metrics():
-    metrics_path = "models/metrics.json"
+    metrics_path = os.path.join(os.path.dirname(__file__), "models", "metrics.json")
     if os.path.exists(metrics_path):
         try:
             with open(metrics_path, 'r') as f:
@@ -29,8 +28,8 @@ def get_saved_metrics():
         "roc_auc": 0.843
     }
 
-@require_GET
-def home(request):
+@app.route('/')
+def home():
     raw_metrics = get_saved_metrics()
     metrics = {
         'accuracy': raw_metrics.get('accuracy', 0) * 100,
@@ -39,17 +38,14 @@ def home(request):
         'precision': raw_metrics.get('precision', 0) * 100,
         'f1': raw_metrics.get('f1', 0) * 100,
     }
-    return render(request, 'index.html', {'metrics': metrics})
+    return render_template('index.html', metrics=metrics)
 
-
-@csrf_exempt
-@require_POST
-def predict(request):
+@app.route('/predict', methods=['POST'])
+def predict():
     try:
-        if not request.body:
-            return JsonResponse({"status": "error", "message": "No JSON data provided"}, status=400)
-            
-        data = json.loads(request.body.decode('utf-8'))
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify({"status": "error", "message": "No JSON data provided"}), 400
 
         custom_data = CustomData(
             gender=data.get('gender'),
@@ -77,27 +73,45 @@ def predict(request):
         pipeline = PredictPipeline()
         pred, prob = pipeline.predict(df)
 
-        return JsonResponse({
+        return jsonify({
             "status": "success",
             "prediction": "Churn" if pred == 1 else "No Churn",
             "churn_probability": round(float(prob), 3)
         })
     except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+        return jsonify({"status": "error", "message": str(e)}), 500
 
-@require_GET
-def get_metrics_endpoint(request):
-    return JsonResponse(get_saved_metrics())
+@app.route('/metrics', methods=['GET'])
+def get_metrics_endpoint():
+    return jsonify(get_saved_metrics())
 
-@csrf_exempt
-@require_POST
-def train_model(request):
+@app.route('/feature_importance', methods=['GET'])
+def get_feature_importance():
+    path = os.path.join(os.path.dirname(__file__), "models", "feature_importance.json")
+    if os.path.exists(path):
+        try:
+            with open(path, 'r') as f:
+                return jsonify(json.load(f))
+        except Exception:
+            pass
+    # Fallback baseline importances matching the historical model
+    data = [
+        ["tenure", 0.178],
+        ["Contract_One year", 0.154],
+        ["MonthlyCharges", 0.132],
+        ["TotalCharges", 0.119],
+        ["InternetService_Fiber optic", 0.086]
+    ]
+    return jsonify(data)
+
+@app.route('/train', methods=['POST'])
+def train_model():
     global training_process
     try:
         if training_process and training_process.poll() is None:
-            return JsonResponse({"status": "error", "message": "Training pipeline is already running."}, status=400)
+            return jsonify({"status": "error", "message": "Training pipeline is already running."}), 400
 
-        log_path = "models/training.log"
+        log_path = os.path.join(os.path.dirname(__file__), "models", "training.log")
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
         # Clear log file and start new run logs
         with open(log_path, 'w') as f:
@@ -112,17 +126,17 @@ def train_model(request):
             text=True
         )
 
-        return JsonResponse({
+        return jsonify({
             "status": "success",
             "message": "Model training pipeline triggered."
         })
     except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+        return jsonify({"status": "error", "message": str(e)}), 500
 
-@require_GET
-def train_stream(request):
+@app.route('/train/stream', methods=['GET'])
+def train_stream():
     def generate():
-        log_path = "models/training.log"
+        log_path = os.path.join(os.path.dirname(__file__), "models", "training.log")
         if not os.path.exists(log_path):
             yield "data: [System] Log file not found.\n\n"
             return
@@ -135,7 +149,6 @@ def train_stream(request):
                 else:
                     global training_process
                     if training_process and training_process.poll() is not None:
-                        # Read remaining lines if any
                         leftover = f.read()
                         if leftover:
                             for l in leftover.splitlines():
@@ -145,48 +158,33 @@ def train_stream(request):
                         break
                     time.sleep(0.5)
 
-    return StreamingHttpResponse(generate(), content_type='text/event-stream')
+    return Response(generate(), mimetype='text/event-stream')
 
-@require_GET
-def get_feature_importance(request):
-    path = "models/feature_importance.json"
-    if os.path.exists(path):
-        try:
-            with open(path, 'r') as f:
-                return JsonResponse(json.load(f), safe=False)
-        except Exception:
-            pass
-    # Fallback baseline importances matching the historical model
-    data = [
-        ["tenure", 0.178],
-        ["Contract_One year", 0.154],
-        ["MonthlyCharges", 0.132],
-        ["TotalCharges", 0.119],
-        ["InternetService_Fiber optic", 0.086]
-    ]
-    return JsonResponse(data, safe=False)
-
-@require_GET
-def get_notebook_html(request):
+@app.route('/notebook', methods=['GET'])
+def get_notebook_html():
     try:
-        # 1. Instant static response if pre-rendered template exists (0 MB extra RAM, <5ms response time)
-        pre_rendered = os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates", "notebook.html")
+        # 1. Pre-rendered static HTML template response
+        pre_rendered = os.path.join(os.path.dirname(__file__), "templates", "notebook.html")
         if os.path.exists(pre_rendered):
-            return render(request, 'notebook.html')
+            return render_template('notebook.html')
 
         # 2. Dynamic fallback conversion
         import nbformat
         from nbconvert import HTMLExporter
         
-        notebook_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "notebook", "churn_prediction.ipynb")
+        notebook_path = os.path.join(os.path.dirname(__file__), "notebook", "churn_prediction.ipynb")
         if not os.path.exists(notebook_path):
-            return HttpResponse("Notebook file not found.", status=404)
+            return "Notebook file not found.", 404
             
         with open(notebook_path, 'r', encoding='utf-8') as f:
             nb = nbformat.read(f, as_version=4)
             
         html_exporter = HTMLExporter()
         (body, resources) = html_exporter.from_notebook_node(nb)
-        return HttpResponse(body)
+        return body
     except Exception as e:
-        return HttpResponse(f"Failed to render notebook: {str(e)}", status=500)
+        return f"Failed to render notebook: {str(e)}", 500
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)

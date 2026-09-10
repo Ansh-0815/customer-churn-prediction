@@ -1,4 +1,3 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Churn Prediction - Production Dashboard</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}?v=9.0.0">
+    <link rel="stylesheet" href="/static/style.css?v=9.0.0">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -48,7 +47,7 @@
                         <a href="https://linkedin.com/in/ansh-agarwal-8th" target="_blank" title="LinkedIn: Ansh Agarwal"><i class="fa-brands fa-linkedin"></i></a>
                     </div>
                 </div>
-                <div class="version">Version 2.0.0 (Django Production)</div>
+                <div class="version">Version 2.0.0 (Flask Production - Vercel)</div>
                 <div class="status-indicator">
                     <span class="status-dot online" id="status-dot"></span>
                     <span class="status-lbl" id="status-text">Server Online</span>
@@ -104,46 +103,46 @@
                             <div class="metric-bar-group">
                                 <div class="metric-lbl-row">
                                     <span>Accuracy</span>
-                                    <span id="metric-accuracy">{{ metrics.accuracy|floatformat:1 }}%</span>
+                                    <span id="metric-accuracy">{{ metrics.accuracy|round(1) }}%</span>
                                 </div>
                                 <div class="progress-track">
-                                    <div class="progress-fill" data-width="{{ metrics.accuracy|floatformat:1 }}%"></div>
+                                    <div class="progress-fill" data-width="{{ metrics.accuracy|round(1) }}%"></div>
                                 </div>
                             </div>
                             <div class="metric-bar-group">
                                 <div class="metric-lbl-row">
                                     <span>ROC AUC</span>
-                                    <span id="metric-roc-auc">{{ metrics.roc_auc|floatformat:1 }}%</span>
+                                    <span id="metric-roc-auc">{{ metrics.roc_auc|round(1) }}%</span>
                                 </div>
                                 <div class="progress-track">
-                                    <div class="progress-fill accent-purple" data-width="{{ metrics.roc_auc|floatformat:1 }}%"></div>
+                                    <div class="progress-fill accent-purple" data-width="{{ metrics.roc_auc|round(1) }}%"></div>
                                 </div>
                             </div>
                             <div class="metric-bar-group">
                                 <div class="metric-lbl-row">
                                     <span>Recall (True Positive Rate)</span>
-                                    <span id="metric-recall">{{ metrics.recall|floatformat:1 }}%</span>
+                                    <span id="metric-recall">{{ metrics.recall|round(1) }}%</span>
                                 </div>
                                 <div class="progress-track">
-                                    <div class="progress-fill accent-pink" data-width="{{ metrics.recall|floatformat:1 }}%"></div>
+                                    <div class="progress-fill accent-pink" data-width="{{ metrics.recall|round(1) }}%"></div>
                                 </div>
                             </div>
                             <div class="metric-bar-group">
                                 <div class="metric-lbl-row">
                                     <span>Precision</span>
-                                    <span id="metric-precision">{{ metrics.precision|floatformat:1 }}%</span>
+                                    <span id="metric-precision">{{ metrics.precision|round(1) }}%</span>
                                 </div>
                                 <div class="progress-track">
-                                    <div class="progress-fill accent-blue" data-width="{{ metrics.precision|floatformat:1 }}%"></div>
+                                    <div class="progress-fill accent-blue" data-width="{{ metrics.precision|round(1) }}%"></div>
                                 </div>
                             </div>
                             <div class="metric-bar-group">
                                 <div class="metric-lbl-row">
                                     <span>F1 Score</span>
-                                    <span id="metric-f1">{{ metrics.f1|floatformat:1 }}%</span>
+                                    <span id="metric-f1">{{ metrics.f1|round(1) }}%</span>
                                 </div>
                                 <div class="progress-track">
-                                    <div class="progress-fill accent-green" data-width="{{ metrics.f1|floatformat:1 }}%"></div>
+                                    <div class="progress-fill accent-green" data-width="{{ metrics.f1|round(1) }}%"></div>
                                 </div>
                             </div>
                         </div>
@@ -652,7 +651,7 @@
         </main>
     </div>
 
-    <script src="{% static 'script.js' %}?v=4.0.0"></script>
+    <script src="/static/script.js?v=4.0.0"></script>
 </body>
 
 </html>

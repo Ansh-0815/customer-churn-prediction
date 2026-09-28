@@ -6,6 +6,7 @@ import joblib
 try:
     import sklearn._loss.loss as _sklearn_loss
     sys.modules['loss'] = _sklearn_loss
+    sys.modules['sklearn._loss'] = sys.modules.get('sklearn._loss', _sklearn_loss)
 except Exception:
     pass
 
@@ -21,4 +22,9 @@ def load_object(file_path):
     try:
         return joblib.load(file_path)
     except Exception as e:
-        raise Exception(f"Error loading object from {file_path}: {e}")
+        # Retry with direct unpickling fallback if needed
+        try:
+            with open(file_path, 'rb') as f:
+                return joblib.load(f)
+        except Exception:
+            raise Exception(f"Error loading object from {file_path}: {e}")

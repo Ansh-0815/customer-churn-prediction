@@ -5,7 +5,8 @@ import os
 try:
     import sklearn._loss.loss as _sklearn_loss
     sys.modules['loss'] = _sklearn_loss
-except ImportError:
+    sys.modules['sklearn._loss'] = sys.modules.get('sklearn._loss', _sklearn_loss)
+except Exception:
     pass
 
 from app import app

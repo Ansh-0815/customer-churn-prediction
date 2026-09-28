@@ -122,11 +122,14 @@ def train_model():
 
         cmd = [sys.executable, "-u", "main.py"]
         log_file = open(log_path, 'a', buffering=1)
+        env = os.environ.copy()
+        env["PYTHONPATH"] = os.path.dirname(__file__) + os.pathsep + env.get("PYTHONPATH", "")
         training_process = subprocess.Popen(
             cmd,
             stdout=log_file,
             stderr=subprocess.STDOUT,
-            text=True
+            text=True,
+            env=env
         )
 
         return jsonify({

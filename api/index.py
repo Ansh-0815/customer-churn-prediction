@@ -1,11 +1,18 @@
 import sys
 import os
+import types
 
-# Polyfill module mapping for legacy scikit-learn unpickling in serverless runtimes
+# Comprehensive polyfills for scikit-learn cross-version unpickling on Vercel
 try:
     import sklearn._loss.loss as _sklearn_loss
     sys.modules['loss'] = _sklearn_loss
     sys.modules['sklearn._loss'] = sys.modules.get('sklearn._loss', _sklearn_loss)
+
+    class DummyLossModule(types.ModuleType):
+        def __getattr__(self, name):
+            return getattr(_sklearn_loss, name, object)
+
+    sys.modules['_loss'] = DummyLossModule('_loss')
 except Exception:
     pass
 

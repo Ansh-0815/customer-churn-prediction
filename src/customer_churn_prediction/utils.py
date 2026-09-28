@@ -1,12 +1,19 @@
 import os
 import sys
+import types
 import joblib
 
-# Polyfill module mapping for legacy scikit-learn unpickling in serverless environments
+# Comprehensive polyfills for scikit-learn cross-version unpickling on Vercel
 try:
     import sklearn._loss.loss as _sklearn_loss
     sys.modules['loss'] = _sklearn_loss
     sys.modules['sklearn._loss'] = sys.modules.get('sklearn._loss', _sklearn_loss)
+
+    class DummyLossModule(types.ModuleType):
+        def __getattr__(self, name):
+            return getattr(_sklearn_loss, name, object)
+
+    sys.modules['_loss'] = DummyLossModule('_loss')
 except Exception:
     pass
 
@@ -22,7 +29,6 @@ def load_object(file_path):
     try:
         return joblib.load(file_path)
     except Exception as e:
-        # Retry with direct unpickling fallback if needed
         try:
             with open(file_path, 'rb') as f:
                 return joblib.load(f)

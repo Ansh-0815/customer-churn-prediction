@@ -2,6 +2,13 @@ import os
 import sys
 import joblib
 
+# Polyfill module mapping for legacy scikit-learn unpickling in serverless environments
+try:
+    import sklearn._loss.loss as _sklearn_loss
+    sys.modules['loss'] = _sklearn_loss
+except Exception:
+    pass
+
 def save_object(file_path, obj):
     try:
         dir_path = os.path.dirname(file_path)

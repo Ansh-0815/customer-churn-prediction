@@ -1,3 +1,11 @@
-from app import app
+import sys
+import os
 
-# Vercel WSGI entry point
+# Polyfill module mapping for legacy scikit-learn unpickling in serverless runtimes
+try:
+    import sklearn._loss.loss as _sklearn_loss
+    sys.modules['loss'] = _sklearn_loss
+except ImportError:
+    pass
+
+from app import app

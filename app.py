@@ -111,8 +111,11 @@ def train_model():
         if training_process and training_process.poll() is None:
             return jsonify({"status": "error", "message": "Training pipeline is already running."}), 400
 
-        log_path = os.path.join(os.path.dirname(__file__), "models", "training.log")
-        os.makedirs(os.path.dirname(log_path), exist_ok=True)
+        # On read-only serverless runtimes (e.g. Vercel), write logs to /tmp
+        log_dir = "/tmp" if os.path.exists("/tmp") else os.path.join(os.path.dirname(__file__), "models")
+        os.makedirs(log_dir, exist_ok=True)
+        log_path = os.path.join(log_dir, "training.log")
+
         # Clear log file and start new run logs
         with open(log_path, 'w') as f:
             f.write("[System] Initializing training pipeline...\n")
@@ -136,7 +139,8 @@ def train_model():
 @app.route('/train/stream', methods=['GET'])
 def train_stream():
     def generate():
-        log_path = os.path.join(os.path.dirname(__file__), "models", "training.log")
+        log_dir = "/tmp" if os.path.exists("/tmp") else os.path.join(os.path.dirname(__file__), "models")
+        log_path = os.path.join(log_dir, "training.log")
         if not os.path.exists(log_path):
             yield "data: [System] Log file not found.\n\n"
             return

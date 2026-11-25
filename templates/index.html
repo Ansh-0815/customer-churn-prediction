@@ -418,9 +418,12 @@
                             <span class="train-status-lbl">Pipeline Run Status:</span>
                             <span class="run-badge" id="active-run-badge">Idle</span>
                         </div>
-                        <button class="btn btn-primary btn-large" id="btn-trigger-training" onclick="triggerModelTraining()">
+                        <button class="btn btn-primary btn-large" id="btn-trigger-training" onclick="triggerModelTraining()"{% if not training_enabled %} disabled title="Retraining is disabled on serverless hosting"{% endif %}>
                             <i class="fa-solid fa-arrows-spin"></i> Trigger MLflow Pipeline
                         </button>
+                        {% if not training_enabled %}
+                        <p style="margin-top: 0.75rem; font-size: 0.8rem; opacity: 0.75;">Retraining is disabled on this serverless deployment. Run <code>python main.py</code> locally, then redeploy the updated <code>models/</code> folder.</p>
+                        {% endif %}
                     </div>
 
                     <!-- Console Bento Cell -->

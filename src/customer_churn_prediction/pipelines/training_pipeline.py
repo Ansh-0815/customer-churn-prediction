@@ -1,5 +1,5 @@
 import os
-import sys
+
 from src.customer_churn_prediction.components.data_ingestion import DataIngestion
 from src.customer_churn_prediction.components.data_transformation import DataTransformation
 from src.customer_churn_prediction.components.model_tranier import ModelTrainer

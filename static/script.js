@@ -651,12 +651,16 @@ async function triggerModelTraining() {
             btn.disabled = false;
             badge.textContent = 'Error';
             badge.classList.remove('running');
+            statusDot.className = 'status-dot online';
+            statusText.textContent = 'Server Online';
         }
     } catch (err) {
         consoleBox.textContent += `\n[Network Error] Could not connect: ${err.message}`;
         btn.disabled = false;
         badge.textContent = 'Idle';
         badge.classList.remove('running');
+        statusDot.className = 'status-dot online';
+        statusText.textContent = 'Server Online';
     }
 }
 

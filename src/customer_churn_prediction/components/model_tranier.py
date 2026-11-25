@@ -1,5 +1,5 @@
 import os
-import sys
+
 import json
 import mlflow
 import mlflow.sklearn
@@ -51,17 +51,16 @@ class ModelTrainer:
                     'roc_auc': float(roc_auc_score(y_test, y_prob))
                 }
 
-                # Log parameters and metrics to MLflow
-                mlflow.log_params(params)
-                mlflow.log_metrics(metrics)
-                mlflow.sklearn.log_model(model, "model")
-
-                # Save model to disk
+                # Save model and metrics to disk first so the web app always gets fresh
+                # artifacts, even if experiment tracking fails afterwards
                 save_object(self.model_file_path, model)
-
-                # Save metrics to json file for Flask access
                 with open(self.metrics_file_path, 'w') as f:
                     json.dump(metrics, f, indent=2)
+
+                # Log parameters, metrics and model to MLflow
+                mlflow.log_params(params)
+                mlflow.log_metrics(metrics)
+                mlflow.sklearn.log_model(model, name="model", serialization_format="cloudpickle")
 
                 # Extract and save feature importances
                 try:

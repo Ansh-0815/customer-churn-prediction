@@ -1,5 +1,5 @@
 import os
-import sys
+
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -13,11 +13,13 @@ class DataTransformation:
         self.preprocessor_obj_file_path = os.path.join(project_root, "models", "scaler.pkl")
         self.columns_obj_file_path = os.path.join(project_root, "models", "model_columns.pkl")
 
-    def clean_data(self, df):
+    def clean_data(self, df, total_charges_median=None):
         try:
             df = df.copy()
             df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
-            df['TotalCharges'] = df['TotalCharges'].fillna(df['TotalCharges'].median())
+            if total_charges_median is None:
+                total_charges_median = df['TotalCharges'].median()
+            df['TotalCharges'] = df['TotalCharges'].fillna(total_charges_median)
             
             if 'customerID' in df.columns:
                 df = df.drop(columns=['customerID'])
@@ -31,8 +33,10 @@ class DataTransformation:
             train_df = pd.read_csv(train_path)
             test_df = pd.read_csv(test_path)
 
-            train_df = self.clean_data(train_df)
-            test_df = self.clean_data(test_df)
+            # Use the training median for both sets to avoid train/test leakage
+            train_median = pd.to_numeric(train_df['TotalCharges'], errors='coerce').median()
+            train_df = self.clean_data(train_df, train_median)
+            test_df = self.clean_data(test_df, train_median)
 
             target_column = 'Churn'
             

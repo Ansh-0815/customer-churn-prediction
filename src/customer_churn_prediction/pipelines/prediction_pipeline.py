@@ -1,8 +1,54 @@
 import os
-import sys
-import pandas as pd
 import numpy as np
+import pandas as pd
 from src.customer_churn_prediction.utils import load_object
+
+ALLOWED_VALUES = {
+    "gender": {"Female", "Male"},
+    "Partner": {"Yes", "No"},
+    "Dependents": {"Yes", "No"},
+    "PhoneService": {"Yes", "No"},
+    "MultipleLines": {"Yes", "No", "No phone service"},
+    "InternetService": {"DSL", "Fiber optic", "No"},
+    "OnlineSecurity": {"Yes", "No", "No internet service"},
+    "OnlineBackup": {"Yes", "No", "No internet service"},
+    "DeviceProtection": {"Yes", "No", "No internet service"},
+    "TechSupport": {"Yes", "No", "No internet service"},
+    "StreamingTV": {"Yes", "No", "No internet service"},
+    "StreamingMovies": {"Yes", "No", "No internet service"},
+    "Contract": {"Month-to-month", "One year", "Two year"},
+    "PaperlessBilling": {"Yes", "No"},
+    "PaymentMethod": {
+        "Electronic check", "Mailed check",
+        "Bank transfer (automatic)", "Credit card (automatic)",
+    },
+}
+NUMERIC_FIELDS = ("SeniorCitizen", "tenure", "MonthlyCharges", "TotalCharges")
+
+
+def validate_payload(data):
+    """Validate and normalise a raw request payload. Raises ValueError on bad input."""
+    clean = {}
+    for field, allowed in ALLOWED_VALUES.items():
+        value = data.get(field)
+        if value not in allowed:
+            raise ValueError(f"Invalid or missing value for '{field}'. Allowed: {sorted(allowed)}")
+        clean[field] = value
+
+    for field in NUMERIC_FIELDS:
+        try:
+            number = float(data.get(field))
+        except (TypeError, ValueError):
+            raise ValueError(f"'{field}' must be a number")
+        if number != number or number in (float("inf"), float("-inf")) or number < 0:
+            raise ValueError(f"'{field}' must be a non-negative number")
+        clean[field] = number
+
+    if clean["SeniorCitizen"] not in (0.0, 1.0):
+        raise ValueError("'SeniorCitizen' must be 0 or 1")
+    clean["SeniorCitizen"] = int(clean["SeniorCitizen"])
+    return clean
+
 
 class PredictPipeline:
     def __init__(self):
@@ -11,12 +57,22 @@ class PredictPipeline:
         self.model_path = os.path.join(project_root, "models", "churn_model.pkl")
         self.preprocessor_path = os.path.join(project_root, "models", "scaler.pkl")
         self.columns_path = os.path.join(project_root, "models", "model_columns.pkl")
+        self._artifacts = None
+
+    def _load(self):
+        # Load once per process (important for warm serverless invocations)
+        if self._artifacts is None:
+            self._artifacts = (
+                load_object(self.model_path),
+                load_object(self.preprocessor_path),
+                load_object(self.columns_path),
+            )
+        return self._artifacts
 
     def predict(self, features_df):
         try:
-            model = load_object(self.model_path)
-            scaler = load_object(self.preprocessor_path)
-            model_columns = load_object(self.columns_path)
+            model, scaler, model_columns = self._load()
+            features_df = features_df.copy()
 
             # Categorical vs Numerical matching training columns
             categorical_cols = ['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines',
@@ -35,6 +91,8 @@ class PredictPipeline:
             for col, mapping in binary_mappings.items():
                 if col in features_df.columns:
                     features_df[col] = features_df[col].map(mapping)
+                    if features_df[col].isnull().any():
+                        raise ValueError(f"Unsupported value for '{col}'")
 
             # Make sure all features are strings or numbers
             features_df['SeniorCitizen'] = features_df['SeniorCitizen'].astype(int)

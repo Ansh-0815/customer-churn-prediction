@@ -65,7 +65,11 @@ customer-churn-prediction/
 ├── app.py                      # Core Flask Application & Serverless Web Handler
 ├── vercel.json                 # Vercel deployment blueprint & Python builder routing
 ├── Procfile                    # Production Gunicorn entrypoint
-├── requirements.txt            # Python dependencies (Flask, MLflow, Scikit-Learn)
+├── api/index.py                # Vercel serverless entrypoint (imports the Flask app)
+├── main.py                     # CLI entrypoint to retrain the model locally
+├── requirements.txt            # Runtime dependencies (pinned, used by Vercel)
+├── requirements-train.txt      # Extra training dependencies (MLflow, imbalanced-learn)
+├── .vercelignore               # Keeps data, notebooks and MLflow runs out of the deployment
 ├── README.md                   # Project documentation
 │
 ├── src/                        # Modular Machine Learning Pipeline Engine
@@ -116,7 +120,23 @@ customer-churn-prediction/
    ```bash
    vercel --prod
    ```
-   Vercel automatically detects `vercel.json`, installs dependencies from `requirements.txt`, and serves `app.py` via `@vercel/python`.
+   Vercel reads `vercel.json`, installs the pinned packages from `requirements.txt` (Python 3.12 via `.python-version`), and serves the Flask app through `api/index.py` with `@vercel/python`.
+
+3. **Notes**:
+   - The pickled model was trained with scikit-learn 1.7.2, so `requirements.txt` pins that exact version. If you upgrade scikit-learn, retrain first.
+   - In-app retraining (`/train`) is disabled on Vercel because the filesystem is read-only and functions are short-lived. Retrain locally, then commit the updated `models/` folder and redeploy.
+   - `GET /health` returns `{"status": "ok"}` for uptime checks.
+
+---
+
+## Retraining Locally
+
+```bash
+python -m venv venv
+source venv/bin/activate        # Windows: .\venv\Scripts\activate
+pip install -r requirements-train.txt
+python main.py
+```
 
 ---
 
@@ -125,6 +145,7 @@ customer-churn-prediction/
 1. **Activate Virtual Environment**:
    ```bash
    .\venv\Scripts\activate
+   pip install -r requirements.txt
    ```
 
 2. **Start Local Flask Server**:

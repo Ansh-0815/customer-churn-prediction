@@ -226,3 +226,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local ML tracking and generated data (regenerate with `python main.py`)
+mlflow.db
+artifacts/
+.idea/
+.vercel/
+.env
+venv/
+.venv/

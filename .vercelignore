@@ -1,0 +1,16 @@
+.git
+.idea
+.vscode
+__pycache__
+*.pyc
+mlruns
+mlflow.db
+artifacts
+data
+notebook
+main.py
+Procfile
+requirements-train.txt
+README.md
+venv
+.venv

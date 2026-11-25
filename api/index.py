@@ -1,19 +1,9 @@
-import sys
 import os
-import types
+import sys
 
-# Comprehensive polyfills for scikit-learn cross-version unpickling on Vercel
-try:
-    import sklearn._loss.loss as _sklearn_loss
-    sys.modules['loss'] = _sklearn_loss
-    sys.modules['sklearn._loss'] = sys.modules.get('sklearn._loss', _sklearn_loss)
+# Make the project root importable when running as a Vercel serverless function
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
 
-    class DummyLossModule(types.ModuleType):
-        def __getattr__(self, name):
-            return getattr(_sklearn_loss, name, object)
-
-    sys.modules['_loss'] = DummyLossModule('_loss')
-except Exception:
-    pass
-
-from app import app
+from app import app  # noqa: E402,F401

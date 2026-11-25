@@ -1,6 +1,6 @@
 # Customer Churn Prediction - Production Flask Dashboard
 
-[![Framework: Flask](https://img.shields.io/badge/Framework-Flask_3.0-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Framework: Flask](https://img.shields.io/badge/Framework-Flask_3.1-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![Deployment: Vercel](https://img.shields.io/badge/Deployment-Vercel_Serverless-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Ansh--0815%2Fcustomer--churn--prediction-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ansh-0815/customer-churn-prediction)
 
@@ -16,7 +16,7 @@ An end-to-end Machine Learning & Web Production System built with **Flask**, **V
 ### 2. Customer Churn Predictor (`/predict`)
 ![Customer Churn Predictor Interface](static/assets/churn_predictor.png)
 
-### 3. MLflow Model Retraining & SSE Log Streaming (`/train`)
+### 3. Model Retraining Console (`/train`)
 ![MLflow Model Retraining Console](static/assets/model_training.png)
 
 ### 4. Extended Exploratory Data Analysis & Feature Exploration (`/eda`)
@@ -49,10 +49,10 @@ Extracted directly from [`notebook/churn_prediction.ipynb`](notebook/churn_predi
 ## Executive Summary
 
 - **Flask Microservices Architecture**: Built with Flask, featuring ultra-fast response times, lightweight serverless architecture for Vercel deployment, semi-transparent frosted acrylic surfaces (`backdrop-filter: blur(18px) saturate(190%)`), inset glass highlights, flat 2D vector grid canvas, and real-time risk scoring.
-- **Vercel Zero Cold-Start Deployment**: Configured via `vercel.json` (`@vercel/python`) for instant serverless execution without Render spin-up delays.
+- **Vercel Serverless Deployment**: Configured via `vercel.json` and `api/index.py` (Python 3.12) so the whole dashboard and prediction API run as a single serverless function.
 - **Extended EDA Analysis & Correlation Matrix**: Features a Pearson feature correlation heatmap matrix, 10-model benchmark comparison table, SMOTE oversampling treatment matrix, and service security stickiness analytics.
 - **Instant Risk Predictor**: Form-driven REST API (`/predict`) providing instant single-customer churn risk scoring and circular SVG risk-meter visualization.
-- **Live Retraining & SSE Telemetry**: Trigger model retraining directly from the UI (`/train`) with real-time console log streaming via Server-Sent Events (`/train/stream`).
+- **Live Retraining**: Trigger model retraining directly from the UI (`/train`). Locally it runs `main.py` in the background with MLflow tracking and streams logs via Server-Sent Events (`/train/stream`). On Vercel it runs in a temporary demo mode inside the request (a few seconds) and the result is not saved permanently.
 - **Embedded Jupyter Notebook Study**: Renders the project's exploratory data analysis and model comparison notebook (`notebook/churn_prediction.ipynb`) into static HTML (`/notebook`).
 - **ML Model Performance**: Evaluated 10 classification algorithms; tuned **Gradient Boosting Classifier** with **SMOTE** oversampling to achieve high recall on churners while maintaining **ROC AUC ≈ 0.84**.
 
@@ -62,95 +62,83 @@ Extracted directly from [`notebook/churn_prediction.ipynb`](notebook/churn_predi
 
 ```
 customer-churn-prediction/
-├── app.py                      # Core Flask Application & Serverless Web Handler
-├── vercel.json                 # Vercel deployment blueprint & Python builder routing
-├── Procfile                    # Production Gunicorn entrypoint
+├── app.py                      # Flask application (routes, validation, training control)
 ├── api/index.py                # Vercel serverless entrypoint (imports the Flask app)
 ├── main.py                     # CLI entrypoint to retrain the model locally
-├── requirements.txt            # Runtime dependencies (pinned, used by Vercel)
-├── requirements-train.txt      # Extra training dependencies (MLflow, imbalanced-learn)
-├── .vercelignore               # Keeps data, notebooks and MLflow runs out of the deployment
-├── README.md                   # Project documentation
+├── vercel.json                 # Vercel function settings and routing
+├── .vercelignore               # Keeps notebooks and MLflow runs out of the deployment
+├── .python-version             # Python 3.12 for Vercel
+├── Procfile                    # Gunicorn entrypoint for non-Vercel hosts
+├── requirements.txt            # Pinned runtime dependencies (used by Vercel)
+├── requirements-train.txt      # Runtime plus MLflow for local training
 │
-├── src/                        # Modular Machine Learning Pipeline Engine
-│   └── customer_churn_prediction/
-│       ├── __init__.py
-│       ├── utils.py            # Utility functions (save/load pickle objects)
-│       ├── components/         # Pipeline Components
-│       │   ├── data_ingestion.py        # Loads raw CSV & splits train/test data
-│       │   ├── data_transformation.py   # Median imputation, One-Hot Encoding, StandardScaler, SMOTE
-│       │   └── model_tranier.py         # Fits tuned Gradient Boosting & logs to MLflow
-│       └── pipelines/          # Execution & Inference Pipelines
-│           ├── training_pipeline.py     # End-to-end retraining pipeline executor
-│           └── prediction_pipeline.py   # CustomData & PredictPipeline for API scoring
+├── src/customer_churn_prediction/
+│   ├── config.py               # Paths and serverless detection
+│   ├── utils.py                # save_object / load_object helpers
+│   ├── components/
+│   │   ├── data_ingestion.py        # Loads raw CSV and splits train/test
+│   │   ├── data_transformation.py   # Imputation, encoding, scaling, SMOTE
+│   │   ├── model_tranier.py         # Gradient Boosting training, optional MLflow logging
+│   │   └── model_monitering.py      # Basic data quality checks
+│   └── pipelines/
+│       ├── training_pipeline.py     # End-to-end retraining
+│       └── prediction_pipeline.py   # Input validation and scoring
 │
-├── data/                       # Dataset Storage
-│   └── Telco-Customer-Churn.csv # IBM Telco 7,043 Customer Records
-│
-├── models/                     # Trained Artifacts & Telemetry
-│   ├── churn_model.pkl         # Serialized Gradient Boosting Model
-│   ├── scaler.pkl              # Serialized StandardScaler Instance
-│   ├── model_columns.pkl       # Feature Matrix Column Alignment List
-│   ├── metrics.json            # Model Evaluation Metrics JSON Log
-│   └── feature_importance.json # Gini Feature Importance Rankings
-│
-├── templates/                  # Jinja2 HTML Templates
-│   ├── index.html              # Frosted Glassmorphism Bento Dashboard
-│   └── notebook.html           # Pre-rendered Static Notebook Template
-│
-├── static/                     # CSS, JS & Image Assets
-│   ├── style.css               # Design System Stylesheet
-│   ├── script.js               # Client-Side Dynamic Routing & Chart Engine
-│   └── assets/                 # Screenshots & Dashboard Charts
-│
-└── notebook/                   # Research & Exploratory Analysis
-    └── churn_prediction.ipynb  # Comprehensive Jupyter Notebook Analysis
+├── data/Telco-Customer-Churn.csv    # IBM Telco dataset (7,043 customers)
+├── models/                     # churn_model.pkl, scaler.pkl, model_columns.pkl, metrics.json, feature_importance.json
+├── templates/                  # index.html (dashboard), notebook.html (rendered notebook)
+├── static/                     # style.css, script.js, assets/
+└── notebook/churn_prediction.ipynb  # EDA and model comparison notebook
 ```
+
+Generated files (`artifacts/`, `mlruns/`, `mlflow.db`) are created locally by `python main.py` and are git-ignored.
 
 ---
 
-## Deploying to Vercel (1-Click Steps)
+## Deploying to Vercel
 
-1. **Install Vercel CLI** (or connect your GitHub repository on Vercel Dashboard):
-   ```bash
-   npm i -g vercel
-   ```
+1. Push this repository to GitHub.
+2. On vercel.com choose **Add New > Project**, import the repository and click **Deploy**. No settings need to be changed.
+3. Or use the CLI: `npm i -g vercel` then `vercel --prod`.
 
-2. **Deploy**:
-   ```bash
-   vercel --prod
-   ```
-   Vercel reads `vercel.json`, installs the pinned packages from `requirements.txt` (Python 3.12 via `.python-version`), and serves the Flask app through `api/index.py` with `@vercel/python`.
+Vercel reads `vercel.json`, installs the pinned packages from `requirements.txt` (Python 3.12 from `.python-version`) and serves the Flask app through `api/index.py`.
 
-3. **Notes**:
-   - The pickled model was trained with scikit-learn 1.7.2, so `requirements.txt` pins that exact version. If you upgrade scikit-learn, retrain first.
-   - In-app retraining (`/train`) is disabled on Vercel because the filesystem is read-only and functions are short-lived. Retrain locally, then commit the updated `models/` folder and redeploy.
-   - `GET /health` returns `{"status": "ok"}` for uptime checks.
-
----
-
-## Retraining Locally
-
-```bash
-python -m venv venv
-source venv/bin/activate        # Windows: .\venv\Scripts\activate
-pip install -r requirements-train.txt
-python main.py
-```
+Notes:
+- The saved model was trained with scikit-learn 1.7.2, so `requirements.txt` pins that exact version. If you change it, retrain first.
+- On Vercel the **Trigger MLflow Pipeline** button runs a temporary demo retrain (a few seconds). The new model lives in `/tmp` and disappears when the function instance recycles. To make a retrain permanent, run `python main.py` locally, commit the updated `models/` folder and redeploy.
+- `GET /health` returns `{"status": "ok"}` for uptime checks.
 
 ---
 
 ## Running Locally
 
-1. **Activate Virtual Environment**:
-   ```bash
-   .\venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+```bash
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+```
 
-2. **Start Local Flask Server**:
-   ```bash
-   python app.py
-   ```
+Open [http://localhost:5000](http://localhost:5000). Set `FLASK_DEBUG=1` for auto-reload.
 
-3. Open **[http://localhost:5000](http://localhost:5000)** in your browser.
+## Retraining Locally (with MLflow tracking)
+
+```bash
+pip install -r requirements-train.txt
+python main.py
+```
+
+This rewrites everything in `models/` and logs the run to `mlflow.db`. Browse runs with `mlflow ui --backend-store-uri sqlite:///mlflow.db`.
+
+## API
+
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| `/` | GET | Dashboard |
+| `/predict` | POST | JSON customer record in, churn prediction and probability out (400 on invalid input) |
+| `/metrics` | GET | Latest model metrics |
+| `/feature_importance` | GET | Top 5 feature importances |
+| `/train` | POST | Retrain the model (background locally, demo mode on Vercel) |
+| `/train/stream` | GET | Server-Sent Events log stream (local only) |
+| `/notebook` | GET | Rendered EDA notebook |
+| `/health` | GET | Health check |

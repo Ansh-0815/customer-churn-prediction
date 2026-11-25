@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+from src.customer_churn_prediction import config
 from src.customer_churn_prediction.utils import load_object
 
 ALLOWED_VALUES = {
@@ -52,20 +53,19 @@ def validate_payload(data):
 
 class PredictPipeline:
     def __init__(self):
-        # Resolve paths dynamically relative to project root
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-        self.model_path = os.path.join(project_root, "models", "churn_model.pkl")
-        self.preprocessor_path = os.path.join(project_root, "models", "scaler.pkl")
-        self.columns_path = os.path.join(project_root, "models", "model_columns.pkl")
+        self._artifacts = None
+
+    def reload(self):
+        """Forget cached artifacts so the next prediction uses the latest trained model."""
         self._artifacts = None
 
     def _load(self):
         # Load once per process (important for warm serverless invocations)
         if self._artifacts is None:
             self._artifacts = (
-                load_object(self.model_path),
-                load_object(self.preprocessor_path),
-                load_object(self.columns_path),
+                load_object(config.resolve_model_file("churn_model.pkl")),
+                load_object(config.resolve_model_file("scaler.pkl")),
+                load_object(config.resolve_model_file("model_columns.pkl")),
             )
         return self._artifacts
 

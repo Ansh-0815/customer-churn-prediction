@@ -7,11 +7,13 @@ import time
 
 from flask import Flask, Response, jsonify, render_template, request
 
+from src.customer_churn_prediction import config
 from src.customer_churn_prediction.pipelines.prediction_pipeline import (
     CustomData,
     PredictPipeline,
     validate_payload,
 )
+from src.customer_churn_prediction.pipelines.training_pipeline import TrainingPipeline
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -21,9 +23,9 @@ app = Flask(
     template_folder=os.path.join(BASE_DIR, "templates"),
 )
 
-# Vercel (and most serverless platforms) cannot run long background jobs and have
-# a read-only filesystem, so in-app retraining is only available on a normal server.
-IS_SERVERLESS = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+# Serverless platforms (Vercel) cannot run background jobs and have a read-only filesystem,
+# so there retraining runs synchronously in a temporary demo mode (see /train).
+IS_SERVERLESS = config.IS_SERVERLESS
 TRAIN_LOG_PATH = os.path.join(tempfile.gettempdir(), "churn_training.log")
 
 training_process = None
@@ -57,14 +59,14 @@ def read_json_file(path, default):
 
 
 def get_saved_metrics():
-    return read_json_file(os.path.join(BASE_DIR, "models", "metrics.json"), DEFAULT_METRICS)
+    return read_json_file(config.resolve_model_file("metrics.json"), DEFAULT_METRICS)
 
 
 @app.route("/")
 def home():
     raw = get_saved_metrics()
     metrics = {k: raw.get(k, 0) * 100 for k in ("accuracy", "roc_auc", "recall", "precision", "f1")}
-    return render_template("index.html", metrics=metrics, training_enabled=not IS_SERVERLESS)
+    return render_template("index.html", metrics=metrics, serverless=IS_SERVERLESS)
 
 
 @app.route("/health")
@@ -103,8 +105,7 @@ def get_metrics_endpoint():
 
 @app.route("/feature_importance", methods=["GET"])
 def get_feature_importance():
-    path = os.path.join(BASE_DIR, "models", "feature_importance.json")
-    return jsonify(read_json_file(path, DEFAULT_IMPORTANCE))
+    return jsonify(read_json_file(config.resolve_model_file("feature_importance.json"), DEFAULT_IMPORTANCE))
 
 
 @app.route("/train", methods=["POST"])
@@ -112,11 +113,18 @@ def train_model():
     global training_process
 
     if IS_SERVERLESS:
-        return jsonify({
-            "status": "error",
-            "message": "Retraining is disabled on serverless hosting (Vercel). "
-                       "Run `python main.py` locally and redeploy the updated models/ folder.",
-        }), 501
+        # Run the pipeline inside this request and return the logs with the response.
+        # The result is kept in /tmp, so it lasts only while this function instance stays warm.
+        logs = []
+        try:
+            TrainingPipeline(log=logs.append).run_pipeline()
+            predict_pipeline.reload()
+            logs.append("[System] Demo mode: the retrained model is temporary on Vercel. "
+                        "Run `python main.py` locally and redeploy to make it permanent.")
+            return jsonify({"status": "success", "message": "Model retrained.", "logs": logs})
+        except Exception as e:
+            app.logger.exception("Serverless training failed")
+            return jsonify({"status": "error", "message": str(e), "logs": logs}), 500
 
     try:
         if training_process and training_process.poll() is None:

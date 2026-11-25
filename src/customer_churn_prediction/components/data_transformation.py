@@ -4,14 +4,13 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import SMOTE
+from src.customer_churn_prediction import config
 from src.customer_churn_prediction.utils import save_object
 
 class DataTransformation:
     def __init__(self):
-        # Resolve paths dynamically relative to project root
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-        self.preprocessor_obj_file_path = os.path.join(project_root, "models", "scaler.pkl")
-        self.columns_obj_file_path = os.path.join(project_root, "models", "model_columns.pkl")
+        self.preprocessor_obj_file_path = os.path.join(config.MODEL_DIR, "scaler.pkl")
+        self.columns_obj_file_path = os.path.join(config.MODEL_DIR, "model_columns.pkl")
 
     def clean_data(self, df, total_charges_median=None):
         try:

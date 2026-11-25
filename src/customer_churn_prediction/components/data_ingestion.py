@@ -2,14 +2,13 @@ import os
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from src.customer_churn_prediction import config
 
 class DataIngestion:
     def __init__(self):
-        # Resolve paths dynamically relative to project root
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-        self.raw_data_path = os.path.join(project_root, "data", "Telco-Customer-Churn.csv")
-        self.train_data_path = os.path.join(project_root, "artifacts", "train.csv")
-        self.test_data_path = os.path.join(project_root, "artifacts", "test.csv")
+        self.raw_data_path = config.RAW_DATA_PATH
+        self.train_data_path = os.path.join(config.ARTIFACT_DIR, "train.csv")
+        self.test_data_path = os.path.join(config.ARTIFACT_DIR, "test.csv")
 
     def initiate_data_ingestion(self):
         try:

@@ -562,6 +562,27 @@ function loadSampleData(type) {
     }
 }
 
+// Fetch the latest metrics from the server and update the dashboard cards
+async function applyLatestMetrics() {
+    const metResponse = await fetch('/metrics');
+    const metData = await metResponse.json();
+
+    document.getElementById('metric-accuracy').textContent = `${(metData.accuracy * 100).toFixed(1)}%`;
+    document.getElementById('metric-roc-auc').textContent = `${(metData.roc_auc * 100).toFixed(1)}%`;
+    document.getElementById('metric-recall').textContent = `${(metData.recall * 100).toFixed(1)}%`;
+    document.getElementById('metric-precision').textContent = `${(metData.precision * 100).toFixed(1)}%`;
+    document.getElementById('metric-f1').textContent = `${(metData.f1 * 100).toFixed(1)}%`;
+
+    const fills = document.querySelectorAll('.progress-fill');
+    if (fills.length >= 5) {
+        fills[0].style.width = `${metData.accuracy * 100}%`;
+        fills[1].style.width = `${metData.roc_auc * 100}%`;
+        fills[2].style.width = `${metData.recall * 100}%`;
+        fills[3].style.width = `${metData.precision * 100}%`;
+        fills[4].style.width = `${metData.f1 * 100}%`;
+    }
+}
+
 // 5. Trigger model training dynamically with EventSource real-time streaming
 async function triggerModelTraining() {
     const btn = document.getElementById('btn-trigger-training');
@@ -583,7 +604,19 @@ async function triggerModelTraining() {
         const response = await fetch('/train', { method: 'POST' });
         const data = await response.json();
 
-        if (data.status === 'success') {
+        if (data.status === 'success' && Array.isArray(data.logs)) {
+            // Serverless mode: the pipeline already finished inside the request
+            consoleBox.textContent += data.logs.join('\n') + '\n';
+            await applyLatestMetrics();
+            await loadFeatureImportance();
+            consoleBox.textContent += `\n[System] Retraining finished. Dashboard metrics updated.`;
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+            btn.disabled = false;
+            badge.textContent = 'Idle';
+            badge.classList.remove('running');
+            statusDot.className = 'status-dot online';
+            statusText.textContent = 'Server Online';
+        } else if (data.status === 'success') {
             consoleBox.textContent += `[System] Training process spawned. Establishing EventSource connection...\n`;
             consoleBox.scrollTop = consoleBox.scrollHeight;
 
@@ -596,26 +629,7 @@ async function triggerModelTraining() {
                 if (logLine === '[EOF]') {
                     eventSource.close();
                     
-                    // Fetch updated metrics
-                    const metResponse = await fetch('/metrics');
-                    const metData = await metResponse.json();
-                    
-                    // Update stats values in UI
-                    document.getElementById('metric-accuracy').textContent = `${(metData.accuracy * 100).toFixed(1)}%`;
-                    document.getElementById('metric-roc-auc').textContent = `${(metData.roc_auc * 100).toFixed(1)}%`;
-                    document.getElementById('metric-recall').textContent = `${(metData.recall * 100).toFixed(1)}%`;
-                    document.getElementById('metric-precision').textContent = `${(metData.precision * 100).toFixed(1)}%`;
-                    document.getElementById('metric-f1').textContent = `${(metData.f1 * 100).toFixed(1)}%`;
-
-                    // Update metrics progress fills
-                    const fills = document.querySelectorAll('.progress-fill');
-                    if (fills.length >= 5) {
-                        fills[0].style.width = `${metData.accuracy * 100}%`;
-                        fills[1].style.width = `${metData.roc_auc * 100}%`;
-                        fills[2].style.width = `${metData.recall * 100}%`;
-                        fills[3].style.width = `${metData.precision * 100}%`;
-                        fills[4].style.width = `${metData.f1 * 100}%`;
-                    }
+                    await applyLatestMetrics();
 
                     consoleBox.textContent += `\n\n[MLflow] Pipeline successfully finished run.\n[System] Gradient Boosting model weights saved: models/churn_model.pkl\n[System] Validation metrics successfully saved: models/metrics.json`;
                     consoleBox.scrollTop = consoleBox.scrollHeight;
@@ -647,7 +661,10 @@ async function triggerModelTraining() {
                 statusText.textContent = 'Server Online';
             };
         } else {
-            consoleBox.textContent += `\n[Error] Retraining failed to start: ${data.message}`;
+            if (Array.isArray(data.logs) && data.logs.length) {
+                consoleBox.textContent += data.logs.join('\n') + '\n';
+            }
+            consoleBox.textContent += `\n[Error] Retraining failed: ${data.message}`;
             btn.disabled = false;
             badge.textContent = 'Error';
             badge.classList.remove('running');

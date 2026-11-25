@@ -6,9 +6,7 @@ __pycache__
 mlruns
 mlflow.db
 artifacts
-data
 notebook
-main.py
 Procfile
 requirements-train.txt
 README.md
